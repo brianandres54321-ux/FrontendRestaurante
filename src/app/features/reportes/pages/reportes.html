@@ -1,0 +1,232 @@
+<div class="container-fluid py-4 px-4 bg-light min-vh-100">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-bar-chart-line me-2 text-primary"></i>Reportes de Ventas
+            </h4>
+            <small class="text-muted">Solo disponible en planes PRO y PREMIUM</small>
+        </div>
+
+        <!-- Botones de descarga -->
+        <div class="d-flex gap-2" *ngIf="reporte && !cargando">
+            <button class="btn btn-outline-danger rounded-3 fw-bold px-4" (click)="descargarPdf()"
+                [disabled]="descargando">
+                <i class="bi bi-file-earmark-pdf me-2"></i>PDF
+            </button>
+            <button class="btn btn-success rounded-3 fw-bold px-4" (click)="descargarExcel()" [disabled]="descargando">
+                <i class="bi bi-file-earmark-excel me-2"></i>Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros de fecha -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-sm-4">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Desde</label>
+                    <input type="date" class="form-control rounded-3" [(ngModel)]="filtroDesde" [max]="filtroHasta" />
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Hasta</label>
+                    <input type="date" class="form-control rounded-3" [(ngModel)]="filtroHasta" [min]="filtroDesde"
+                        [max]="hoy" />
+                </div>
+                <div class="col-sm-4 d-flex gap-2">
+                    <button class="btn btn-primary rounded-3 fw-bold flex-grow-1" (click)="cargarReporte()"
+                        [disabled]="cargando">
+                        <span *ngIf="!cargando"><i class="bi bi-search me-2"></i>Consultar</span>
+                        <span *ngIf="cargando"><span
+                                class="spinner-border spinner-border-sm me-2"></span>Cargando...</span>
+                    </button>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-outline-secondary rounded-3 small px-2" (click)="setRango('hoy')"
+                            title="Hoy">Hoy</button>
+                        <button class="btn btn-outline-secondary rounded-3 small px-2" (click)="setRango('semana')"
+                            title="Esta semana">7d</button>
+                        <button class="btn btn-outline-secondary rounded-3 small px-2" (click)="setRango('mes')"
+                            title="Este mes">Mes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error de plan -->
+    <div class="alert alert-warning rounded-4 border-0 shadow-sm d-flex align-items-center gap-3" *ngIf="errorPlan">
+        <i class="bi bi-lock-fill fs-4 text-warning"></i>
+        <div>
+            <strong>Plan insuficiente</strong>
+            <p class="mb-0 small">Los reportes están disponibles en los planes <strong>PRO</strong> y
+                <strong>PREMIUM</strong>.
+                <a routerLink="/empresa" class="text-primary fw-bold">Actualizar plan →</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Error general -->
+    <div class="alert alert-danger rounded-4 border-0 shadow-sm" *ngIf="error && !errorPlan">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+    </div>
+
+    <!-- Sin datos -->
+    <div *ngIf="reporte && reporte.cantidadPedidos === 0 && !cargando" class="text-center py-5 text-muted">
+        <i class="bi bi-receipt display-1 opacity-25"></i>
+        <p class="mt-3 fs-5">No hay ventas en el período seleccionado</p>
+    </div>
+
+    <!-- Contenido del reporte -->
+    <ng-container *ngIf="reporte && reporte.cantidadPedidos > 0 && !cargando">
+
+        <!-- Tarjetas KPI -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Total ventas</p>
+                                <h3 class="fw-black text-primary mb-0">{{ reporte.totalVentas |
+                                    currency:'COP':'$':'1.0-0' }}</h3>
+                            </div>
+                            <div class="rounded-3 p-2 bg-primary bg-opacity-10">
+                                <i class="bi bi-currency-dollar fs-4 text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Pedidos</p>
+                                <h3 class="fw-black text-dark mb-0">{{ reporte.cantidadPedidos }}</h3>
+                            </div>
+                            <div class="rounded-3 p-2 bg-secondary bg-opacity-10">
+                                <i class="bi bi-receipt fs-4 text-secondary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small fw-bold text-uppercase mb-1">Ticket promedio</p>
+                                <h3 class="fw-black text-info mb-0">{{ reporte.ticketPromedio |
+                                    currency:'COP':'$':'1.0-0' }}</h3>
+                            </div>
+                            <div class="rounded-3 p-2 bg-info bg-opacity-10">
+                                <i class="bi bi-graph-up fs-4 text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <p class="text-muted small fw-bold text-uppercase mb-2">Por método</p>
+                        <div class="d-flex flex-column gap-1">
+                            <div class="d-flex justify-content-between">
+                                <span class="small"><i class="bi bi-cash-coin text-success me-1"></i>Efectivo</span>
+                                <span class="fw-bold small">{{ reporte.totalEfectivo | currency:'COP':'$':'1.0-0'
+                                    }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="small"><i class="bi bi-bag-check me-1"
+                                        style="color:#009EE3"></i>MercadoPago</span>
+                                <span class="fw-bold small">{{ reporte.totalMercadoPago | currency:'COP':'$':'1.0-0'
+                                    }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Productos + Detalle pagos -->
+        <div class="row g-4">
+
+            <!-- Top 5 productos -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-bottom border-light py-3 rounded-top-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-trophy me-2 text-warning"></i>Top 5 Productos</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div *ngFor="let p of reporte.topProductos; let i = index"
+                            class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom border-light">
+                            <div class="d-flex align-items-center gap-3">
+                                <span
+                                    class="badge rounded-circle d-flex align-items-center justify-content-center fw-black"
+                                    style="width:28px;height:28px;font-size:12px;"
+                                    [class]="i === 0 ? 'bg-warning text-dark' : i === 1 ? 'bg-secondary' : 'bg-light text-muted'">
+                                    {{ i + 1 }}
+                                </span>
+                                <div>
+                                    <span class="fw-bold d-block text-dark small">{{ p.nombre }}</span>
+                                    <span class="text-muted" style="font-size:11px;">{{ p.cantidadVendida }}
+                                        unidades</span>
+                                </div>
+                            </div>
+                            <span class="fw-bold text-primary small">{{ p.ingresoGenerado | currency:'COP':'$':'1.0-0'
+                                }}</span>
+                        </div>
+                        <div *ngIf="reporte.topProductos.length === 0" class="text-center py-4 text-muted small">
+                            Sin datos
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalle de pagos -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div
+                        class="card-header bg-white border-bottom border-light py-3 rounded-top-4 d-flex justify-content-between">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-list-check me-2 text-primary"></i>Detalle de Pagos</h6>
+                        <span class="badge bg-light text-muted rounded-pill">{{ reporte.pagos.length }} registros</span>
+                    </div>
+                    <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-borderless align-middle mb-0 small">
+                            <thead class="bg-light text-muted sticky-top" style="font-size:11px;">
+                                <tr>
+                                    <th class="ps-4">Pago</th>
+                                    <th>Mesa</th>
+                                    <th>Método</th>
+                                    <th class="text-end pe-4">Monto</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let f of reporte.pagos" class="border-bottom border-light">
+                                    <td class="ps-4 text-muted">#{{ f.pagoId }}</td>
+                                    <td class="fw-bold text-dark">{{ f.mesa }}</td>
+                                    <td>
+                                        <span class="badge rounded-pill"
+                                            [class]="f.metodo === 'EFECTIVO' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info'">
+                                            {{ f.metodo === 'EFECTIVO' ? 'Efectivo' : 'Mercado Pago' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4 fw-bold text-dark">{{ f.monto | currency:'COP':'$':'1.0-0'
+                                        }}</td>
+                                    <td class="text-muted" style="font-size:11px;">{{ f.fecha | date:'dd/MM HH:mm' }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </ng-container>
+
+</div>

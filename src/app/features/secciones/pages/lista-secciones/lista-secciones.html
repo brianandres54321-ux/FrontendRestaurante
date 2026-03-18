@@ -1,0 +1,167 @@
+<div class="gestion-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Mesas y Secciones</h4>
+            <small class="text-muted">Organiza el espacio de tu restaurante</small>
+        </div>
+        <div class="header-actions">
+            <button class="btn-sec btn-outline" (click)="abrirCrearSeccion()">
+                <i class="bi bi-folder-plus"></i> Nueva Sección
+            </button>
+            <button class="btn-sec btn-primary" (click)="abrirCrearMesa()" [disabled]="secciones.length === 0">
+                <i class="bi bi-plus-lg"></i> Nueva Mesa
+            </button>
+        </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout-cols">
+
+        <!-- COLUMNA SECCIONES -->
+        <div class="col-secciones">
+            <div class="col-title">Secciones <span class="count">{{ secciones.length }}</span></div>
+
+            <div *ngIf="cargando" class="empty-state-sm">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+            </div>
+
+            <div *ngIf="!cargando && secciones.length === 0" class="empty-state-sm">
+                <i class="bi bi-folder2-open"></i>
+                <span>Sin secciones</span>
+            </div>
+
+            <div *ngFor="let s of secciones; trackBy: trackById" class="seccion-item"
+                [class.activa]="seccionActiva === s.id" (click)="seleccionarSeccion(s.id)">
+
+                <div class="seccion-info">
+                    <i class="bi bi-grid-3x3-gap-fill seccion-icon"></i>
+                    <div>
+                        <span class="seccion-nombre">{{ s.nombre }}</span>
+                        <span class="seccion-count">{{ mesasDe(s.id).length }} mesa(s)</span>
+                    </div>
+                </div>
+
+                <div class="seccion-acciones" (click)="$event.stopPropagation()">
+                    <button class="btn-icon-sm" (click)="abrirEditarSeccion(s)" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon-sm btn-danger-sm" (click)="eliminarSeccion(s)" title="Eliminar">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA MESAS -->
+        <div class="col-mesas">
+            <div class="col-title">
+                Mesas de <strong>{{ seccionActivaObj?.nombre ?? 'todas las secciones' }}</strong>
+                <span class="count">{{ (seccionActiva ? mesasDe(seccionActiva) : mesas).length }}</span>
+            </div>
+
+            <div class="mesas-grid">
+
+                <div *ngIf="!cargando && (seccionActiva ? mesasDe(seccionActiva) : mesas).length === 0"
+                    class="empty-state-sm full">
+                    <i class="bi bi-table"></i>
+                    <span>No hay mesas en esta sección</span>
+                    <button class="btn-sec btn-primary btn-sm" (click)="abrirCrearMesa()">
+                        <i class="bi bi-plus-lg"></i> Agregar mesa
+                    </button>
+                </div>
+
+                <div *ngFor="let m of (seccionActiva ? mesasDe(seccionActiva) : mesas); trackBy: trackById"
+                    class="mesa-card">
+
+                    <!-- Estado indicador -->
+                    <div class="mesa-estado-bar" [ngClass]="getBadgeEstado(m.estado)"></div>
+
+                    <div class="mesa-body">
+                        <div class="mesa-nombre">{{ m.nombre }}</div>
+                        <div class="mesa-seccion">{{ m.seccionNombre }}</div>
+                        <span class="mesa-badge" [ngClass]="getBadgeEstado(m.estado)">
+                            {{ m.estado === 'LIBRE' ? 'Libre' : m.estado === 'OCUPADA' ? 'Ocupada' : 'Bloqueada' }}
+                        </span>
+                    </div>
+
+                    <div class="mesa-acciones">
+                        <button class="btn-icon-sm" (click)="abrirEditarMesa(m)" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn-icon-sm btn-danger-sm" (click)="eliminarMesa(m)"
+                            [disabled]="m.estado === 'OCUPADA'" title="Eliminar">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── MODAL SECCIÓN ── -->
+<div class="modal-overlay" *ngIf="modalSeccion" (click)="modalSeccion = false"></div>
+<div class="modal-panel" *ngIf="modalSeccion">
+    <div class="modal-header">
+        <h5>{{ editandoSeccion ? 'Editar Sección' : 'Nueva Sección' }}</h5>
+        <button class="btn-close-modal" (click)="modalSeccion = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="alert-error" *ngIf="errorSeccion">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorSeccion }}
+        </div>
+        <div class="form-group">
+            <label>Nombre de la sección *</label>
+            <input type="text" [(ngModel)]="formSeccion.nombre" placeholder="Ej: Terraza, Salón principal...">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn-cancelar" (click)="modalSeccion = false">Cancelar</button>
+        <button class="btn-guardar" (click)="guardarSeccion()" [disabled]="guardandoSeccion">
+            <span *ngIf="!guardandoSeccion"><i class="bi bi-check-lg me-1"></i>{{ editandoSeccion ? 'Guardar' : 'Crear'
+                }}</span>
+            <span *ngIf="guardandoSeccion"><span class="spinner-border spinner-border-sm me-1"></span>
+                Guardando...</span>
+        </button>
+    </div>
+</div>
+
+<!-- ── MODAL MESA ── -->
+<div class="modal-overlay" *ngIf="modalMesa" (click)="modalMesa = false"></div>
+<div class="modal-panel" *ngIf="modalMesa">
+    <div class="modal-header">
+        <h5>{{ editandoMesa ? 'Editar Mesa' : 'Nueva Mesa' }}</h5>
+        <button class="btn-close-modal" (click)="modalMesa = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="alert-error" *ngIf="errorMesa">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMesa }}
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nombre de la mesa *</label>
+                <input type="text" [(ngModel)]="formMesa.nombre" placeholder="Ej: Mesa 1, VIP-3...">
+            </div>
+            <div class="form-group">
+                <label>Sección *</label>
+                <select [(ngModel)]="formMesa.seccionId">
+                    <option [ngValue]="0" disabled>Seleccionar...</option>
+                    <option *ngFor="let s of secciones" [ngValue]="s.id">{{ s.nombre }}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn-cancelar" (click)="modalMesa = false">Cancelar</button>
+        <button class="btn-guardar" (click)="guardarMesa()" [disabled]="guardandoMesa">
+            <span *ngIf="!guardandoMesa"><i class="bi bi-check-lg me-1"></i>{{ editandoMesa ? 'Guardar' : 'Crear'
+                }}</span>
+            <span *ngIf="guardandoMesa"><span class="spinner-border spinner-border-sm me-1"></span> Guardando...</span>
+        </button>
+    </div>
+</div>

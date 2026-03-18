@@ -1,0 +1,48 @@
+<div class="container-fluid py-4 px-4 bg-light min-vh-100">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-black mb-0">Historial de Facturación</h2>
+            <p class="text-muted small">Gestionado por <strong>{{nombreSoftware}}</strong></p>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 px-4 py-2 bg-white">
+            <small class="text-muted d-block">TOTAL RECAUDADO</small>
+            <span class="fw-bold fs-4 text-primary">$2.450.000</span>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3">NRO. FACTURA</th>
+                        <th>FECHA</th>
+                        <th>MESA</th>
+                        <th>MÉTODO</th>
+                        <th class="text-end">PROPINA</th>
+                        <th class="text-end pe-4">TOTAL PAGADO</th>
+                        <th class="text-center">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="animate__animated animate__fadeIn">
+                        <td class="ps-4 fw-bold">#FAC-0001</td>
+                        <td class="text-muted">Hoy, 10:30 AM</td>
+                        <td>Mesa 1</td>
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 bg-success-subtle text-success">EFECTIVO</span>
+                        </td>
+                        <td class="text-end">$700</td>
+                        <td class="text-end fw-black pe-4">$7.700</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-white border shadow-sm rounded-pill px-3"
+                                (click)="imprimirFactura(null)">
+                                <i class="bi bi-printer me-1"></i> Re-imprimir
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

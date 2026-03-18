@@ -1,0 +1,56 @@
+<div class="layout-container mt-4">
+    <header class="dashboard-header mb-5">
+        <div class="header-content">
+            <h1 class="display-title">Planimetría Digital</h1>
+            <span class="subtitle">Gestión de mesas y disponibilidad operativa</span>
+        </div>
+
+        <div class="filter-group d-flex align-items-center gap-3">
+            <button class="union-toggle-btn" [class.active]="modoSeleccion" (click)="toggleModoSeleccion()">
+                <i class="bi" [ngClass]="modoSeleccion ? 'bi-x-circle' : 'bi-plus-circle'"></i>
+                {{ modoSeleccion ? 'Cancelar' : 'Unir Mesas' }}
+            </button>
+
+            <div class="select-wrapper">
+                <select class="modern-select" [(ngModel)]="seccionSeleccionada" (change)="filtrarPorSeccion()">
+                    <option [ngValue]="null">Vista Global</option>
+                    <option *ngFor="let seccion of secciones" [ngValue]="seccion.id">{{ seccion.nombre }}</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="selection-banner" *ngIf="modoSeleccion && mesasSeleccionadas.length > 1">
+        <span>Has seleccionado <strong>{{ mesasSeleccionadas.length }}</strong> mesas</span>
+        <button class="confirm-union-btn" (click)="confirmarUnion()">Confirmar Unión</button>
+    </div>
+
+    <div class="mesa-grid" *ngIf="mesasFiltradas.length > 0">
+        <div class="mesa-item" *ngFor="let mesa of mesasFiltradas; let i = index; trackBy: trackByMesa"
+            [attr.data-status]="mesa.estado | lowercase" [class.is-selected]="mesasSeleccionadas.includes(mesa.id)"
+            [class.is-grouped]="mesa.grupoId" [class.is-connected]="esMismoGrupoQueAnterior(i)"
+            [style.z-index]="mesa.grupoId ? (100 - i) : 1">
+            <div class="mesa-card-inner" (click)="seleccionarMesa(mesa)">
+                <button *ngIf="mesa.grupoId && !modoSeleccion" class="quick-desunir-btn"
+                    (click)="$event.stopPropagation(); confirmarDesunion(mesa.id)">
+                    <i class="bi bi-link-45deg"></i>
+                </button>
+                <div class="mesa-header">
+                    <span class="mesa-number">{{ mesa.nombre }}</span>
+                    <span *ngIf="mesa.grupoId" class="badge-grupo">G-{{ mesa.grupoId }}</span>
+                </div>
+                <div class="mesa-body">
+                    <div class="section-tag">{{ obtenerNombreSeccion(mesa) }}</div>
+                </div>
+                <div class="mesa-footer">
+                    <span class="status-text">{{ mesa.estado === 'LIBRE' ? 'Disponible' : mesa.estado }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center py-5" *ngIf="mesasFiltradas.length === 0">
+        <i class="bi bi-search display-1 text-muted"></i>
+        <p class="mt-3">No hay mesas disponibles en esta sección.</p>
+    </div>
+</div>

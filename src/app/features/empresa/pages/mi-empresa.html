@@ -1,0 +1,164 @@
+<div class="empresa-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Mi Empresa</h4>
+            <small class="text-muted">Configuración y plan de suscripción</small>
+        </div>
+    </div>
+
+    <div *ngIf="cargando" class="empty-state">
+        <div class="spinner-border text-primary"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <div *ngIf="!cargando && empresa" class="content-grid">
+
+        <!-- ── INFO DE LA EMPRESA ── -->
+        <div class="info-card">
+            <div class="info-header">
+                <div class="empresa-avatar">
+                    {{ empresa.nombre.charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">{{ empresa.nombre }}</h5>
+                    <small class="text-muted">NIT/RUT: {{ empresa.nitRut }}</small>
+                </div>
+            </div>
+
+            <div class="plan-actual">
+                <span class="plan-label">Plan actual</span>
+                <span class="plan-badge" [attr.data-plan]="empresa.plan">
+                    <i class="bi me-1" [ngClass]="getIconoPlan(empresa.plan)"></i>
+                    {{ planActual.nombre }}
+                </span>
+            </div>
+
+            <div class="info-features">
+                <div class="feature-row">
+                    <i class="bi bi-table text-muted"></i>
+                    <span>{{ planActual.mesas }}</span>
+                </div>
+                <div class="feature-row">
+                    <i class="bi bi-people text-muted"></i>
+                    <span>{{ planActual.usuarios }}</span>
+                </div>
+                <div class="feature-row">
+                    <i class="bi text-muted" [class.bi-check-circle-fill]="planActual.mercadoPago"
+                        [class.text-success]="planActual.mercadoPago" [class.bi-x-circle-fill]="!planActual.mercadoPago"
+                        [class.text-danger]="!planActual.mercadoPago"></i>
+                    <span>Mercado Pago</span>
+                </div>
+                <div class="feature-row">
+                    <i class="bi text-muted" [class.bi-check-circle-fill]="planActual.reportes"
+                        [class.text-success]="planActual.reportes" [class.bi-x-circle-fill]="!planActual.reportes"
+                        [class.text-danger]="!planActual.reportes"></i>
+                    <span>Reportes exportables</span>
+                </div>
+                <div class="feature-row">
+                    <i class="bi bi-headset text-muted"></i>
+                    <span>Soporte {{ planActual.soporte }}</span>
+                </div>
+            </div>
+
+            <button class="btn-editar" (click)="abrirEditar()">
+                <i class="bi bi-pencil me-2"></i> Editar datos empresa
+            </button>
+
+            <div class="alert-exito" *ngIf="exito">
+                <i class="bi bi-check-circle-fill me-2"></i>{{ exito }}
+            </div>
+        </div>
+
+        <!-- ── PLANES ── -->
+        <div class="planes-section">
+            <h6 class="planes-title">Planes disponibles</h6>
+
+            <div class="planes-grid">
+                <div *ngFor="let plan of planes" class="plan-card" [class.plan-actual]="esPlanActual(plan.id)"
+                    [class.plan-recomendado]="plan.recomendado" [attr.data-plan]="plan.id">
+
+                    <div class="plan-header">
+                        <div class="plan-recomendado-badge" *ngIf="plan.recomendado">Recomendado</div>
+                        <i class="bi plan-icon" [ngClass]="getIconoPlan(plan.id)"></i>
+                        <h5 class="plan-nombre">{{ plan.nombre }}</h5>
+                        <div class="plan-precio">{{ plan.precio }}</div>
+                    </div>
+
+                    <div class="plan-features">
+                        <div class="pf-row">
+                            <i class="bi bi-table"></i> {{ plan.mesas }}
+                        </div>
+                        <div class="pf-row">
+                            <i class="bi bi-people"></i> {{ plan.usuarios }}
+                        </div>
+                        <div class="pf-row" [class.pf-off]="!plan.mercadoPago">
+                            <i class="bi" [class.bi-check2]="plan.mercadoPago" [class.bi-x]="!plan.mercadoPago"></i>
+                            Mercado Pago
+                        </div>
+                        <div class="pf-row" [class.pf-off]="!plan.reportes">
+                            <i class="bi" [class.bi-check2]="plan.reportes" [class.bi-x]="!plan.reportes"></i>
+                            Reportes
+                        </div>
+                        <div class="pf-row">
+                            <i class="bi bi-headset"></i> {{ plan.soporte }}
+                        </div>
+                    </div>
+
+                    <button class="btn-plan" [class.btn-plan-actual]="esPlanActual(plan.id)"
+                        [class.btn-plan-upgrade]="!esPlanActual(plan.id)"
+                        [disabled]="esPlanActual(plan.id) || guardando" (click)="cambiarPlan(plan.id)">
+                        <span *ngIf="esPlanActual(plan.id)">
+                            <i class="bi bi-check2 me-1"></i> Plan actual
+                        </span>
+                        <span *ngIf="!esPlanActual(plan.id)">
+                            {{ empresa!.plan === 'PREMIUM' || (empresa!.plan === 'PRO' && plan.id === 'BASICO')
+                            ? 'Cambiar a ' + plan.nombre
+                            : 'Actualizar a ' + plan.nombre }}
+                        </span>
+                    </button>
+
+                </div>
+            </div>
+
+            <p class="planes-nota">
+                <i class="bi bi-info-circle me-1"></i>
+                Para cambios de plan o facturación contacta a soporte.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── MODAL EDITAR ── -->
+<div class="modal-overlay" *ngIf="modalEditar" (click)="modalEditar = false"></div>
+<div class="modal-panel" *ngIf="modalEditar">
+    <div class="modal-header">
+        <h5>Editar datos de la empresa</h5>
+        <button class="btn-close-modal" (click)="modalEditar = false">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="alert-error" *ngIf="error">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        </div>
+        <div class="form-group">
+            <label>Nombre de la empresa *</label>
+            <input type="text" [(ngModel)]="form.nombre" placeholder="Ej: Restaurante El Buen Sabor">
+        </div>
+        <div class="form-group">
+            <label>NIT / RUT *</label>
+            <input type="text" [(ngModel)]="form.nitRut" placeholder="Ej: 900123456-1">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn-cancelar" (click)="modalEditar = false">Cancelar</button>
+        <button class="btn-guardar" (click)="guardarEmpresa()" [disabled]="guardando">
+            <span *ngIf="!guardando"><i class="bi bi-check-lg me-1"></i> Guardar</span>
+            <span *ngIf="guardando"><span class="spinner-border spinner-border-sm me-1"></span> Guardando...</span>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,204 @@
+<div class="pedidos-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Dashboard de Ventas</h4>
+            <span class="page-date">{{ today | date:'EEEE, d \'de\' MMMM yyyy' }}</span>
+        </div>
+        <button class="btn-refresh" (click)="cargarTodos()" [disabled]="cargando">
+            <i class="bi bi-arrow-clockwise" [class.spin]="cargando"></i>
+            Actualizar
+        </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+        <div class="stat-card stat-blue">
+            <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="stat-body">
+                <span class="stat-label">Ventas hoy</span>
+                <span class="stat-value">{{ totalVentasHoy | currency:'COP':'$':'1.0-0' }}</span>
+                <span class="stat-sub">{{ pedidosPagadosHoy }} pedido(s) cerrado(s)</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-green">
+            <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="stat-body">
+                <span class="stat-label">Ventas del mes</span>
+                <span class="stat-value">{{ totalVentasMes | currency:'COP':'$':'1.0-0' }}</span>
+                <span class="stat-sub">Acumulado mensual</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-amber">
+            <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+            <div class="stat-body">
+                <span class="stat-label">Comandas abiertas</span>
+                <span class="stat-value">{{ comandasAbiertas }}</span>
+                <span class="stat-sub">En este momento</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-purple">
+            <div class="stat-icon"><i class="bi bi-pie-chart"></i></div>
+            <div class="stat-body">
+                <span class="stat-label">Por método (hoy)</span>
+                <div class="metodos-list">
+                    <div class="metodo-row">
+                        <span><i class="bi bi-cash-coin text-success"></i> Efectivo</span>
+                        <strong>{{ ventasEfectivo | currency:'COP':'$':'1.0-0' }}</strong>
+                    </div>
+                    <div class="metodo-row">
+                        <span><i class="bi bi-credit-card text-primary"></i> Tarjeta</span>
+                        <strong>{{ ventasTarjeta | currency:'COP':'$':'1.0-0' }}</strong>
+                    </div>
+                    <div class="metodo-row">
+                        <span><i class="bi bi-phone" style="color:#7b2ff7"></i> Nequi</span>
+                        <strong>{{ ventasNequi | currency:'COP':'$':'1.0-0' }}</strong>
+                    </div>
+                    <div class="metodo-row">
+                        <span><i class="bi bi-bag-check" style="color:#009EE3"></i> MP</span>
+                        <strong>{{ ventasMercadoPago | currency:'COP':'$':'1.0-0' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros-card">
+        <div class="filtros-row">
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Buscar por mesa o ID..." [(ngModel)]="busqueda"
+                    (input)="aplicarFiltros()">
+            </div>
+
+            <select [(ngModel)]="estadoSeleccionado" (change)="aplicarFiltros()">
+                <option value="TODOS">Todos los estados</option>
+                <option value="ABIERTO">🟡 Abiertos</option>
+                <option value="PAGADO">🟢 Pagados</option>
+            </select>
+
+            <select [(ngModel)]="metodoPagoFiltro" (change)="aplicarFiltros()">
+                <option value="TODOS">Todos los métodos</option>
+                <option value="EFECTIVO">💵 Efectivo</option>
+                <option value="TARJETA">💳 Tarjeta</option>
+                <option value="NEQUI">📱 Nequi</option>
+                <option value="MERCADOPAGO">🛒 Mercado Pago</option>
+            </select>
+
+            <span class="resultado-count">{{ pedidosFiltrados.length }} resultado(s)</span>
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="tabla-card">
+
+        <!-- Loading -->
+        <div *ngIf="cargando" class="empty-state">
+            <div class="spinner-border text-primary"></div>
+            <p>Cargando pedidos...</p>
+        </div>
+
+        <div class="tabla-wrapper" *ngIf="!cargando">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-id">#</th>
+                        <th class="col-mesa">Mesa</th>
+                        <th class="col-fecha">Apertura</th>
+                        <th class="col-fecha">Cierre</th>
+                        <th class="col-metodo">Método</th>
+                        <th class="col-estado">Estado</th>
+                        <th class="col-total">Total</th>
+                        <th class="col-accion">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let p of pedidosFiltrados; trackBy: trackByPedido"
+                        [class.row-cancelado]="p.estado === 'CANCELADO'">
+
+                        <td class="col-id">
+                            <span class="pedido-id">#{{ p.id }}</span>
+                        </td>
+
+                        <td class="col-mesa">
+                            <span class="mesa-nombre">{{ p.mesa }}</span>
+                            <span *ngIf="p.grupoId" class="badge-grupal">Grupal</span>
+                        </td>
+
+                        <td class="col-fecha text-muted small">
+                            {{ p.fechaApertura | date:'dd/MM HH:mm' }}
+                        </td>
+
+                        <td class="col-fecha small">
+                            <span *ngIf="p.fechaCierre" class="cierre-fecha">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                {{ p.fechaCierre | date:'dd/MM HH:mm' }}
+                            </span>
+                            <span *ngIf="!p.fechaCierre" class="text-muted">—</span>
+                        </td>
+
+                        <td class="col-metodo">
+                            <span *ngIf="p.metodoPago" class="metodo-badge" [attr.data-metodo]="p.metodoPago">
+                                <i class="bi" [ngClass]="getIconoMetodo(p.metodoPago)"></i>
+                                {{ getLabelMetodo(p.metodoPago) }}
+                            </span>
+                            <span *ngIf="!p.metodoPago" class="text-muted small">
+                                {{ p.estado === 'ABIERTO' ? 'Pendiente' : '—' }}
+                            </span>
+                        </td>
+
+                        <td class="col-estado">
+                            <span class="estado-badge" [ngClass]="getBadgeEstado(p.estado)">
+                                {{ p.estado }}
+                            </span>
+                        </td>
+
+                        <td class="col-total">
+                            <span class="total-valor" [class.text-muted]="p.estado === 'CANCELADO'">
+                                {{ p.total | currency:'COP':'$':'1.0-0' }}
+                            </span>
+                        </td>
+
+                        <td class="col-accion">
+                            <!-- Abrir gestión -->
+                            <button *ngIf="p.estado === 'ABIERTO'" class="btn-accion btn-gestionar"
+                                (click)="verDetalle(p)">
+                                <i class="bi bi-pencil-square"></i> Gestionar
+                            </button>
+
+                            <!-- Solo ver (pagado) -->
+                            <span *ngIf="p.estado === 'PAGADO'" class="text-muted small">
+                                <i class="bi bi-check2-circle text-success"></i> Cobrado
+                            </span>
+
+                            <!-- Restaurar (cancelado) -->
+                            <button *ngIf="p.estado === 'CANCELADO'" class="btn-accion btn-restaurar"
+                                (click)="restaurar(p)" title="Restaurar pedido">
+                                <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                            </button>
+                        </td>
+
+                    </tr>
+
+                    <tr *ngIf="pedidosFiltrados.length === 0">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox display-4 opacity-25"></i>
+                                <p>No se encontraron pedidos con estos filtros</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

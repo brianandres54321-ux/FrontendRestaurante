@@ -1,0 +1,170 @@
+<div class="usuarios-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Usuarios</h4>
+            <small class="text-muted">Gestiona los accesos de tu equipo</small>
+        </div>
+        <button class="btn-nuevo" (click)="abrirCrear()">
+            <i class="bi bi-person-plus-fill"></i> Nuevo Usuario
+        </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-pill">
+            <i class="bi bi-people-fill"></i>
+            <span>{{ usuarios.length }} usuarios</span>
+        </div>
+        <div class="stat-pill stat-green">
+            <i class="bi bi-circle-fill"></i>
+            <span>{{ usuariosActivos }} activos</span>
+        </div>
+        <div class="stat-pill stat-red">
+            <i class="bi bi-circle-fill"></i>
+            <span>{{ usuariosInactivos }} inactivos</span>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros-card">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar por nombre, usuario o email..." [(ngModel)]="busqueda"
+                (input)="aplicarFiltros()">
+        </div>
+        <div class="rol-tabs">
+            <button [class.active]="rolFiltro === 'TODOS'"
+                (click)="rolFiltro = 'TODOS'; aplicarFiltros()">Todos</button>
+            <button [class.active]="rolFiltro === 'ADMIN'"
+                (click)="rolFiltro = 'ADMIN'; aplicarFiltros()">Admin</button>
+            <button [class.active]="rolFiltro === 'CAJERO'"
+                (click)="rolFiltro = 'CAJERO'; aplicarFiltros()">Cajero</button>
+            <button [class.active]="rolFiltro === 'MESERO'"
+                (click)="rolFiltro = 'MESERO'; aplicarFiltros()">Mesero</button>
+        </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="usuarios-grid">
+
+        <div *ngIf="cargando" class="empty-state">
+            <div class="spinner-border text-primary"></div>
+            <p>Cargando usuarios...</p>
+        </div>
+
+        <div *ngIf="!cargando && usuariosFiltrados.length === 0" class="empty-state">
+            <i class="bi bi-people display-4 opacity-25"></i>
+            <p>No se encontraron usuarios</p>
+        </div>
+
+        <div *ngFor="let u of usuariosFiltrados; trackBy: trackBy" class="usuario-card" [class.inactivo]="!u.activo">
+
+            <!-- Avatar -->
+            <div class="avatar" [attr.data-rol]="u.rol">
+                {{ u.nombre.charAt(0).toUpperCase() }}
+            </div>
+
+            <!-- Info -->
+            <div class="usuario-info">
+                <div class="usuario-nombre">
+                    {{ u.nombre }}
+                    <span *ngIf="!u.activo" class="badge-inactivo">Inactivo</span>
+                </div>
+                <div class="usuario-meta">
+                    <span><i class="bi bi-at"></i> {{ u.username }}</span>
+                    <span><i class="bi bi-envelope"></i> {{ u.email }}</span>
+                </div>
+            </div>
+
+            <!-- Rol -->
+            <span class="rol-badge" [ngClass]="getBadgeRol(u.rol)">
+                <i class="bi" [class.bi-shield-fill]="u.rol === 'ADMIN'" [class.bi-cash-coin]="u.rol === 'CAJERO'"
+                    [class.bi-person-fill]="u.rol === 'MESERO'"></i>
+                {{ u.rol }}
+            </span>
+
+            <!-- Acciones -->
+            <div class="usuario-acciones">
+                <button class="btn-accion btn-editar" (click)="abrirEditar(u)" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-accion" [class.btn-desactivar]="u.activo" [class.btn-activar]="!u.activo"
+                    (click)="toggleActivo(u)" [title]="u.activo ? 'Desactivar' : 'Activar'">
+                    <i class="bi" [class.bi-person-dash]="u.activo" [class.bi-person-check]="!u.activo"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ── MODAL CREAR / EDITAR ── -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()"></div>
+<div class="modal-panel" *ngIf="mostrarModal">
+
+    <div class="modal-header">
+        <h5>{{ editando ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
+        <button class="btn-close-modal" (click)="cerrarModal()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="modal-body">
+
+        <div class="alert-error" *ngIf="errorModal">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorModal }}
+        </div>
+
+        <div class="form-group">
+            <label>Nombre completo *</label>
+            <input type="text" [(ngModel)]="form.nombre" placeholder="Ej: María García">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Usuario *</label>
+                <input type="text" [(ngModel)]="form.username" placeholder="Ej: mgarcia" [disabled]="!!editando">
+                <small *ngIf="editando" class="text-muted">No se puede cambiar el usuario</small>
+            </div>
+            <div class="form-group">
+                <label>Rol *</label>
+                <select [(ngModel)]="form.rol">
+                    <option value="ADMIN">👑 Admin</option>
+                    <option value="CAJERO">💰 Cajero</option>
+                    <option value="MESERO">🍽️ Mesero</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="form.email" placeholder="Ej: maria@restaurante.com">
+        </div>
+
+        <div class="form-group">
+            <label>{{ editando ? 'Nueva contraseña (dejar vacío para no cambiar)' : 'Contraseña *' }}</label>
+            <input type="password" [(ngModel)]="form.password"
+                [placeholder]="editando ? 'Dejar vacío para no cambiar' : 'Mínimo 6 caracteres'">
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn-cancelar" (click)="cerrarModal()" [disabled]="guardando">
+            Cancelar
+        </button>
+        <button class="btn-guardar" (click)="guardar()" [disabled]="guardando">
+            <span *ngIf="!guardando">
+                <i class="bi bi-check-lg me-1"></i>
+                {{ editando ? 'Guardar cambios' : 'Crear usuario' }}
+            </span>
+            <span *ngIf="guardando">
+                <span class="spinner-border spinner-border-sm me-1"></span> Guardando...
+            </span>
+        </button>
+    </div>
+
+</div>

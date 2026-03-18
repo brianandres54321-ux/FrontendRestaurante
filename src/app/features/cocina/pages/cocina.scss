@@ -1,0 +1,629 @@
+$bg: #0f172a;
+$surface: #1e293b;
+$surface2: #263347;
+$border: #334155;
+$text: #f1f5f9;
+$muted: #94a3b8;
+
+$verde: #22c55e;
+$amarillo: #eab308;
+$rojo: #ef4444;
+$azul: #3b82f6;
+
+// ── Wrapper ───────────────────────────────────────────────────
+.kds-wrapper {
+    min-height: 100vh;
+    background: $bg;
+    color: $text;
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+// ── Topbar ────────────────────────────────────────────────────
+.kds-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .7rem 1.5rem;
+    background: $surface;
+    border-bottom: 1px solid $border;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.kds-topbar-left,
+.kds-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+.kds-logo {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.kds-count {
+    font-size: .8rem;
+    color: $muted;
+    background: $border;
+    padding: .2rem .65rem;
+    border-radius: 99px;
+}
+
+.kds-update {
+    font-size: .72rem;
+    color: $muted;
+}
+
+.kds-btn {
+    background: $border;
+    color: $text;
+    border: none;
+    padding: .4rem .7rem;
+    border-radius: 8px;
+    font-size: .82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    transition: background .15s;
+
+    &:hover {
+        background: lighten($border, 8%);
+    }
+}
+
+.kds-btn-salir {
+    background: #374151;
+
+    &:hover {
+        background: #4b5563;
+    }
+}
+
+// ── Empty ─────────────────────────────────────────────────────
+.kds-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: $text;
+}
+
+// ── Board ─────────────────────────────────────────────────────
+.kds-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    flex: 1;
+    align-items: start;
+}
+
+// ── Columna ───────────────────────────────────────────────────
+.kds-col {
+    border-right: 1px solid $border;
+    min-height: calc(100vh - 52px);
+    display: flex;
+    flex-direction: column;
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
+.kds-col-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .8rem 1rem;
+    border-bottom: 2px solid $border;
+    position: sticky;
+    top: 52px;
+    z-index: 10;
+    background: $surface;
+}
+
+.kds-col-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pendiente-dot {
+    background: $amarillo;
+}
+
+.preparacion-dot {
+    background: $azul;
+}
+
+.listo-dot {
+    background: $verde;
+}
+
+.pendiente-header {
+    border-bottom-color: $amarillo;
+}
+
+.preparacion-header {
+    border-bottom-color: $azul;
+}
+
+.listo-header {
+    border-bottom-color: $verde;
+}
+
+.kds-col-titulo {
+    font-size: .88rem;
+    font-weight: 700;
+    flex: 1;
+}
+
+.kds-col-badge {
+    font-size: .75rem;
+    font-weight: 700;
+    background: $border;
+    color: $muted;
+    padding: .15rem .55rem;
+    border-radius: 99px;
+}
+
+.kds-col-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    padding: 2.5rem 1rem;
+    color: $muted;
+    font-size: .82rem;
+
+    i {
+        font-size: 2rem;
+    }
+}
+
+// ── Tarjeta de mesa ───────────────────────────────────────────
+.kds-card {
+    margin: .75rem;
+    border-radius: 12px;
+    border: 2px solid $border;
+    background: $surface;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &.kds-pendiente {
+        border-left: 5px solid $amarillo;
+    }
+
+    &.kds-en-preparacion {
+        border-left: 5px solid $azul;
+    }
+
+    &.kds-listo {
+        border-left: 5px solid $verde;
+        opacity: .82;
+    }
+
+    &.kds-advertencia {
+        border-color: $amarillo;
+        animation: pulso-amarillo 3s ease-in-out infinite;
+    }
+
+    &.kds-urgente {
+        border-color: $rojo;
+        animation: pulso-rojo 1.5s ease-in-out infinite;
+    }
+}
+
+@keyframes pulso-amarillo {
+
+    0%,
+    100% {
+        box-shadow: 0 0 4px rgba($amarillo, .15);
+    }
+
+    50% {
+        box-shadow: 0 0 14px rgba($amarillo, .4);
+    }
+}
+
+@keyframes pulso-rojo {
+
+    0%,
+    100% {
+        box-shadow: 0 0 8px rgba($rojo, .3);
+    }
+
+    50% {
+        box-shadow: 0 0 22px rgba($rojo, .65);
+    }
+}
+
+// ── Cabecera tarjeta ──────────────────────────────────────────
+.kds-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .8rem 1rem .6rem;
+    border-bottom: 1px solid $border;
+}
+
+.kds-mesa-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.kds-mesa-label {
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: $muted;
+    text-transform: uppercase;
+}
+
+.kds-mesa-nombre {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: $text;
+    letter-spacing: -.01em;
+}
+
+.kds-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .25rem;
+}
+
+.kds-tiempo {
+    font-size: .72rem;
+    font-weight: 600;
+    padding: .2rem .55rem;
+    border-radius: 99px;
+    background: rgba($verde, .15);
+    color: $verde;
+
+    &.tiempo-advertencia {
+        background: rgba($amarillo, .15);
+        color: $amarillo;
+    }
+
+    &.tiempo-urgente {
+        background: rgba($rojo, .2);
+        color: $rojo;
+        font-weight: 700;
+    }
+
+    &.tiempo-listo {
+        background: rgba($verde, .15);
+        color: $verde;
+    }
+}
+
+.kds-total-items {
+    font-size: .68rem;
+    color: $muted;
+}
+
+.kds-progreso {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: .2rem .55rem;
+    border-radius: 99px;
+    background: rgba($azul, .15);
+    color: $azul;
+
+    &.progreso-completo {
+        background: rgba($verde, .15);
+        color: $verde;
+    }
+}
+
+// ── Barra de progreso ─────────────────────────────────────────
+.kds-progress-bar {
+    height: 3px;
+    background: $border;
+
+    .kds-progress-fill {
+        height: 100%;
+        background: $azul;
+        transition: width .3s ease;
+
+        &[style*="100%"] {
+            background: $verde;
+        }
+    }
+}
+
+// ── Grid de cartas de ítems ───────────────────────────────────
+.kds-items-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: .4rem 0;
+    flex: 1;
+}
+
+.kds-item-card {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem 1rem;
+    border-bottom: 1px solid rgba($border, .5);
+    cursor: pointer;
+    transition: background .15s;
+    user-select: none;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover:not(.item-listo) {
+        background: rgba($azul, .08);
+    }
+
+    &.item-listo {
+        background: rgba($verde, .06);
+        cursor: default;
+
+        .item-cantidad {
+            color: $verde;
+        }
+
+        .item-nombre {
+            text-decoration: line-through;
+            color: $muted;
+            opacity: .7;
+        }
+
+        .item-check {
+            color: $verde;
+        }
+    }
+}
+
+.item-cantidad {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: $text;
+    min-width: 2.2rem;
+    text-align: center;
+    line-height: 1;
+    transition: color .2s;
+}
+
+.item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+}
+
+.item-nombre {
+    font-size: .98rem;
+    font-weight: 600;
+    color: $text;
+    transition: color .2s, text-decoration .2s;
+}
+
+.item-notas {
+    font-size: .7rem;
+    color: $amarillo;
+    font-style: italic;
+}
+
+.item-check {
+    font-size: 1.3rem;
+    color: rgba($muted, .3);
+    transition: color .2s, transform .15s;
+    flex-shrink: 0;
+
+    .kds-item-card:not(.item-listo):hover & {
+        color: rgba($azul, .5);
+        transform: scale(1.1);
+    }
+}
+
+.kds-items-listos .kds-item-card {
+    cursor: default;
+
+    &:hover {
+        background: transparent;
+    }
+}
+
+// ── Botones de acción ─────────────────────────────────────────
+.kds-card-actions {
+    display: flex;
+    gap: .5rem;
+    padding: .6rem .75rem;
+    border-top: 1px solid $border;
+    background: rgba(#000, .15);
+
+    &.two-actions .btn-listo {
+        flex: 1;
+    }
+}
+
+.kds-action-btn {
+    border: none;
+    border-radius: 8px;
+    padding: .6rem .9rem;
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem;
+    width: 100%;
+    transition: filter .15s, opacity .15s;
+
+    &:disabled {
+        opacity: .45;
+        cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+        filter: brightness(1.12);
+    }
+}
+
+.btn-preparar {
+    background: $azul;
+    color: #fff;
+}
+
+.btn-listo {
+    background: $verde;
+    color: #fff;
+}
+
+.btn-regresar {
+    background: $border;
+    color: $muted;
+    width: auto;
+    flex-shrink: 0;
+    padding: .6rem .8rem;
+}
+
+.btn-regresar-full {
+    background: $border;
+    color: $muted;
+}
+
+
+// ── Fila compacta de listos ───────────────────────────────────
+.kds-listo-row {
+    border-bottom: 1px solid $border;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.kds-listo-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .65rem 1rem;
+    cursor: pointer;
+    transition: background .15s;
+    gap: .75rem;
+
+    &:hover {
+        background: rgba($verde, .06);
+    }
+}
+
+.listo-summary-left {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.listo-icon {
+    font-size: 1.2rem;
+    color: $verde;
+    flex-shrink: 0;
+}
+
+.listo-mesa-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.listo-mesa-nombre {
+    font-size: 1rem;
+    font-weight: 800;
+    color: $text;
+    line-height: 1.1;
+}
+
+.listo-platos {
+    font-size: .68rem;
+    color: $muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.listo-summary-right {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-shrink: 0;
+}
+
+.kds-btn-sm {
+    border: none;
+    background: $border;
+    color: $muted;
+    border-radius: 6px;
+    padding: .3rem .5rem;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+
+    &:hover {
+        background: lighten($border, 8%);
+        color: $text;
+    }
+
+    &:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
+}
+
+.listo-chevron {
+    font-size: .8rem;
+    color: $muted;
+    transition: transform .2s;
+}
+
+// ── Detalle expandible ────────────────────────────────────────
+.kds-listo-detalle {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease;
+    background: rgba($verde, .04);
+    border-top: 0 solid $border;
+
+    &.expandido {
+        max-height: 600px;
+        border-top: 1px solid rgba($verde, .15);
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────
+@media (max-width: 900px) {
+    .kds-board {
+        grid-template-columns: 1fr;
+    }
+
+    .kds-col {
+        border-right: none;
+        border-bottom: 2px solid $border;
+        min-height: auto;
+    }
+
+    .kds-update {
+        display: none;
+    }
+}

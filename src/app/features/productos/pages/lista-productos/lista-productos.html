@@ -1,0 +1,119 @@
+<div class="container-fluid p-4 bg-white shadow-sm rounded-4 mt-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                {{ viendoInactivos ? 'Papelera de Productos' : 'Inventario de Productos' }}
+            </h2>
+            <p class="text-muted small mb-0">
+                {{ viendoInactivos ? 'Productos desactivados' : 'Tienes ' + productosFiltrados.length + ' productos
+                registrados' }}
+            </p>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <div class="input-group input-group-sm" style="max-width: 250px;">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control bg-light border-start-0" placeholder="Buscar..."
+                    [(ngModel)]="busqueda" (input)="filtrarProductos()">
+            </div>
+
+            <select class="form-select form-select-sm" style="max-width:150px" [(ngModel)]="categoriaSeleccionada"
+                (change)="filtrarProductos()">
+                <option [ngValue]="null">Todas las categorías</option>
+                <option *ngFor="let c of categorias" [ngValue]="c.id">{{c.nombre}}</option>
+            </select>
+
+            <button class="btn btn-sm d-flex align-items-center gap-2"
+                [ngClass]="viendoInactivos ? 'btn-outline-primary' : 'btn-outline-secondary'"
+                (click)="toggleVerInactivos()">
+                <i class="bi" [ngClass]="viendoInactivos ? 'bi-arrow-left' : 'bi-trash'"></i>
+                <span>{{ viendoInactivos ? 'Volver al Inventario' : 'Ver Papelera' }}</span>
+            </button>
+
+            <button *ngIf="!viendoInactivos" class="btn btn-sm btn-primary shadow-sm d-flex align-items-center gap-2"
+                (click)="abrirModal()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table">
+            <thead class="table-light">
+                <tr>
+                    <th class="border-0 text-muted fw-semibold py-3 ps-4">Producto</th>
+                    <th class="border-0 text-muted fw-semibold py-3">Estado</th>
+                    <th class="border-0 text-muted fw-semibold py-3 text-end">Precio</th>
+                    <th class="border-0 text-muted fw-semibold py-3 text-center">Stock</th>
+                    <th class="border-0 text-muted fw-semibold py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="border-top-0">
+                <tr *ngIf="productosFiltrados.length === 0">
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        No se encontraron productos {{ viendoInactivos ? 'en la papelera' : '' }}.
+                    </td>
+                </tr>
+
+                <tr *ngFor="let p of productosFiltrados; trackBy: trackByProducto" class="product-row">
+                    <td class="ps-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="img-container bg-light rounded-3 d-flex align-items-center justify-content-center">
+                                <img *ngIf="p.imagen" [src]="p.imagen"
+                                    class="img-thumbnail border-0 bg-transparent p-1">
+                                <i *ngIf="!p.imagen" class="bi bi-box text-muted fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">{{p.nombre}}</div>
+                                <small class="text-muted">ID: {{p.id}}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span *ngIf="!viendoInactivos" class="badge rounded-pill"
+                            [ngClass]="p.stock > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'">
+                            {{ p.stock > 0 ? 'Disponible' : 'Sin Stock' }}
+                        </span>
+                        <span *ngIf="viendoInactivos" class="badge rounded-pill bg-secondary-subtle text-secondary">
+                            En Papelera
+                        </span>
+                    </td>
+                    <td class="text-end fw-bold text-dark">
+                        {{p.precioActual | currency:'COP':'symbol-narrow':'1.0-0'}}
+                    </td>
+                    <td class="text-center">
+                        <span class="fw-semibold">{{p.stock}}</span>
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <ng-container *ngIf="!viendoInactivos">
+                                <button class="btn btn-icon btn-light-primary btn-sm" (click)="editarProducto(p)"
+                                    title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-icon btn-light-danger btn-sm" (click)="eliminarProducto(p)"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </ng-container>
+
+                            <ng-container *ngIf="viendoInactivos">
+                                <button class="btn btn-sm btn-success d-flex align-items-center gap-1"
+                                    (click)="activarProducto(p)">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Restaurar
+                                </button>
+                            </ng-container>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<app-crear-producto *ngIf="mostrarModal" [visible]="mostrarModal" [categorias]="categorias"
+    [productoParaEditar]="productoEditando" (cerrar)="cerrarModal()" (guardado)="productoGuardado()">
+</app-crear-producto>

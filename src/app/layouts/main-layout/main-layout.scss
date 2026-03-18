@@ -1,0 +1,24 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1;
+    min-width: 0;
+    background: #f1f5f9;
+    overflow-y: auto;
+}
+
+/* Móvil — el sidebar es topbar fijo, el content necesita margen arriba */
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .content {
+        /* ~90px = topbar empresa (~42px) + menú (~48px) */
+        margin-top: 90px;
+        padding-bottom: 16px;
+    }
+}

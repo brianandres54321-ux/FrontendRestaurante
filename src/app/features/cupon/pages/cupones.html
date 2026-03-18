@@ -1,0 +1,205 @@
+<div class="container-fluid py-4 px-4 bg-light min-vh-100">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-ticket-perforated me-2 text-warning"></i>Cupones de Descuento
+            </h4>
+            <small class="text-muted">Gestiona los códigos de descuento para tus clientes</small>
+        </div>
+        <button class="btn btn-primary rounded-3 fw-bold px-4" (click)="abrirModal()">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Cupón
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+    </div>
+
+    <!-- Sin cupones -->
+    <div *ngIf="!cargando && cupones.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-ticket-perforated display-1 opacity-25"></i>
+        <p class="mt-3 fs-5">Sin cupones creados aún</p>
+        <button class="btn btn-primary rounded-3 px-4" (click)="abrirModal()">
+            Crear primer cupón
+        </button>
+    </div>
+
+    <!-- Tabla de cupones -->
+    <div class="card border-0 shadow-sm rounded-4" *ngIf="!cargando && cupones.length > 0">
+        <div class="table-responsive">
+            <table class="table table-borderless align-middle mb-0 small">
+                <thead class="bg-light text-muted" style="font-size:11px;">
+                    <tr>
+                        <th class="ps-4">Código</th>
+                        <th>Descuento</th>
+                        <th>Vigencia</th>
+                        <th>Mín. pedido</th>
+                        <th class="text-center">Usos</th>
+                        <th class="text-center">Estado</th>
+                        <th class="pe-4 text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let c of cupones" class="border-bottom border-light">
+                        <td class="ps-4">
+                            <span class="badge bg-warning text-dark rounded-pill fw-black px-3 py-2"
+                                style="font-size:13px; letter-spacing:.05em;">
+                                {{ c.codigo }}
+                            </span>
+                            <span class="d-block text-muted mt-1" style="font-size:11px;">
+                                {{ c.descripcion || '—' }}
+                            </span>
+                        </td>
+                        <td class="fw-bold text-dark">
+                            <span *ngIf="c.tipo === 'PORCENTAJE'" class="text-success">
+                                <i class="bi bi-percent me-1"></i>{{ c.valor }}% off
+                            </span>
+                            <span *ngIf="c.tipo === 'MONTO_FIJO'" class="text-primary">
+                                <i class="bi bi-currency-dollar me-1"></i>
+                                {{ c.valor | currency:'COP':'$':'1.0-0' }} off
+                            </span>
+                        </td>
+                        <td class="text-muted">
+                            <span *ngIf="c.fechaInicio || c.fechaFin" style="font-size:11px;">
+                                {{ c.fechaInicio ? (c.fechaInicio | date:'dd/MM/yy':'UTC') : '∞' }}
+                                →
+                                {{ c.fechaFin ? (c.fechaFin | date:'dd/MM/yy':'UTC') : '∞' }}
+                            </span>
+                            <span *ngIf="!c.fechaInicio && !c.fechaFin" class="text-muted">Sin vencimiento</span>
+                        </td>
+                        <td class="text-muted">
+                            {{ c.montoMinimo ? (c.montoMinimo | currency:'COP':'$':'1.0-0') : '—' }}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border rounded-pill">
+                                {{ c.usosActuales }}
+                                <span *ngIf="c.usosMaximos"> / {{ c.usosMaximos }}</span>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill"
+                                [class]="c.activo ? 'bg-success bg-opacity-10 text-success' : 'bg-secondary bg-opacity-10 text-secondary'">
+                                {{ c.activo ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <button class="btn btn-sm btn-outline-primary rounded-3" (click)="abrirModal(c)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-3" (click)="eliminar(c)">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal crear / editar ── -->
+<div class="modal-backdrop fade show" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
+<div class="modal fade show d-block" *ngIf="modalAbierto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="fw-bold mb-0">
+                    {{ editando ? 'Editar cupón' : 'Nuevo cupón' }}
+                </h5>
+                <button class="btn-close" (click)="cerrarModal()"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+
+                <!-- Código -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Código *</label>
+                    <input type="text" class="form-control rounded-3 fw-bold text-uppercase" [(ngModel)]="form.codigo"
+                        placeholder="Ej: VERANO20" style="letter-spacing:.08em;"
+                        (input)="form.codigo = form.codigo.toUpperCase()" maxlength="50">
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Descripción</label>
+                    <input type="text" class="form-control rounded-3" [(ngModel)]="form.descripcion"
+                        placeholder="Ej: Descuento de verano" maxlength="100">
+                </div>
+
+                <!-- Tipo + Valor -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Tipo *</label>
+                        <select class="form-select rounded-3" [(ngModel)]="form.tipo">
+                            <option value="PORCENTAJE">Porcentaje (%)</option>
+                            <option value="MONTO_FIJO">Monto fijo ($)</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">
+                            Valor * {{ form.tipo === 'PORCENTAJE' ? '(%)' : '($)' }}
+                        </label>
+                        <input type="number" class="form-control rounded-3" [(ngModel)]="form.valor"
+                            [max]="form.tipo === 'PORCENTAJE' ? 100 : 9999999" min="1" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Vigencia -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Desde</label>
+                        <input type="date" class="form-control rounded-3" [(ngModel)]="form.fechaInicio">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Hasta</label>
+                        <input type="date" class="form-control rounded-3" [(ngModel)]="form.fechaFin"
+                            [min]="form.fechaInicio ?? ''">
+                    </div>
+                </div>
+
+                <!-- Límites -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Usos máximos</label>
+                        <input type="number" class="form-control rounded-3" [(ngModel)]="form.usosMaximos" min="1"
+                            placeholder="Ilimitado">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Pedido mínimo ($)</label>
+                        <input type="number" class="form-control rounded-3" [(ngModel)]="form.montoMinimo" min="0"
+                            placeholder="Sin mínimo">
+                    </div>
+                </div>
+
+                <!-- Activo toggle -->
+                <div class="form-check form-switch d-flex justify-content-between align-items-center
+          p-3 bg-light rounded-3">
+                    <label class="form-check-label fw-bold text-dark mb-0">Cupón activo</label>
+                    <input class="form-check-input ms-0" type="checkbox" role="switch" [(ngModel)]="form.activo"
+                        style="cursor:pointer; width:2.5em; height:1.25em;">
+                </div>
+
+                <!-- Error -->
+                <div class="alert alert-danger rounded-3 mt-3 small border-0" *ngIf="errorModal">
+                    <i class="bi bi-exclamation-triangle me-1"></i>{{ errorModal }}
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
+                <button class="btn btn-outline-secondary rounded-3 flex-grow-1"
+                    (click)="cerrarModal()">Cancelar</button>
+                <button class="btn btn-primary rounded-3 flex-grow-1 fw-bold" (click)="guardar()"
+                    [disabled]="guardando">
+                    <span *ngIf="!guardando">{{ editando ? 'Guardar cambios' : 'Crear cupón' }}</span>
+                    <span *ngIf="guardando">
+                        <span class="spinner-border spinner-border-sm me-1"></span>Guardando...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

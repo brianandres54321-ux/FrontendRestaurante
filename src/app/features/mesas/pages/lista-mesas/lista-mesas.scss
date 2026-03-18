@@ -1,0 +1,314 @@
+// Variables de Colores
+$bg-main: #f7f9fc;
+$text-dark: #32325d;
+$text-muted: #8898aa;
+$accent-group: #5e72e4; // Color principal para uniones
+
+$states: (
+    "libre": ("bg": #e7faf0, "accent": #2dce89, "text": #1aae6f),
+    "ocupada": ("bg": #f1f3ff, "accent": #5e72e4, "text": #324cdd),
+    "reservada": ("bg": #fff5f2, "accent": #fb6340, "text": #f5365c),
+    "bloqueada": ("bg": #f4f5f7, "accent": #adb5bd, "text": #8898aa)
+);
+
+.layout-container {
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 0 1.5rem;
+    background-color: $bg-main;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #eaedf2;
+    padding-bottom: 1.5rem;
+
+    .display-title {
+        font-weight: 800;
+        color: $text-dark;
+        letter-spacing: -1px;
+        margin-bottom: 0;
+    }
+}
+
+// Grid principal
+.mesa-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem; // Espacio entre mesas normales
+    padding: 20px;
+}
+
+.mesa-item {
+    position: relative;
+    flex: 0 0 auto;
+    width: 200px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 1;
+
+    .mesa-card-inner {
+        background: white;
+        border-radius: 20px;
+        padding: 1.25rem;
+        height: 160px;
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden; // Para que el brillo del estado no se salga
+    }
+
+    // 🔥 LÓGICA DE CASCADA INCREMENTAL
+    &.is-grouped {
+
+        // Todas las mesas del grupo excepto la primera se desplazan
+        &.is-connected {
+            margin-left: -155px; // Ajusta según qué tan "apretadas" las quieras
+
+            .mesa-card-inner {
+                // Sombra izquierda pronunciada para separar de la mesa anterior
+                box-shadow: -10px 0 20px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+                border-left: 1px solid rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        // Efecto abanico al pasar el mouse
+        &:hover {
+            z-index: 500 !important; // Salta al frente de todo el layout
+            transform: translateY(-12px) scale(1.05);
+
+            .mesa-card-inner {
+                box-shadow: 0 20px 40px rgba(50, 50, 93, 0.2);
+                border-color: rgba($accent-group, 0.5);
+            }
+
+            // Si la mesa de al lado está conectada, le damos un poco de aire
+            +.is-connected {
+                transform: translateX(10px);
+            }
+        }
+    }
+
+    // Estados dinámicos
+    @each $state, $colors in $states {
+        &[data-status="#{$state}"] {
+            .status-indicator {
+                background: map-get($colors, "accent");
+                box-shadow: 0 0 12px map-get($colors, "accent");
+            }
+
+            .status-text {
+                color: map-get($colors, "text");
+                background: map-get($colors, "bg");
+            }
+
+            // Opcional: un borde sutil del color del estado
+            &.is-grouped .mesa-card-inner {
+                border-top: 3px solid map-get($colors, "accent");
+            }
+        }
+    }
+
+    // Mesa seleccionada (Modo Unión)
+    &.is-selected {
+        z-index: 600 !important;
+
+        .mesa-card-inner {
+            border: 2px solid #fb6340 !important;
+            background-color: #fff9f8;
+            transform: scale(1.02);
+            animation: pulse-select 1.5s infinite;
+        }
+    }
+}
+
+
+
+// Botón de desunión rápida (Eslabón)
+.quick-desunir-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    background: #f5365c;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    z-index: 20;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        transform: scale(1.2);
+        background: $text-dark;
+    }
+}
+
+.mesa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .mesa-number {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: $text-dark;
+    }
+
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .badge-grupo {
+        font-size: 0.65rem;
+        background: $accent-group;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+    }
+}
+
+.section-tag {
+    font-size: 0.75rem;
+    color: $text-muted;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.mesa-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .status-text {
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .action-btn {
+        border: none;
+        background: none;
+        color: #ced4da;
+        padding: 0;
+
+        &:hover {
+            color: $text-dark;
+        }
+    }
+}
+
+// UI Controls
+.union-toggle-btn {
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    background: white;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &.active {
+        background: #f5365c;
+        color: white;
+        border-color: #f5365c;
+    }
+}
+
+.selection-banner {
+    background: $text-dark;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+    .confirm-union-btn {
+        background: #2dce89;
+        border: none;
+        color: white;
+        padding: 0.6rem 1.8rem;
+        border-radius: 10px;
+        font-weight: 700;
+        transition: 0.2s;
+
+        &:hover {
+            transform: translateY(-2px);
+            background: #24a46d;
+        }
+    }
+}
+
+.modern-select {
+    appearance: none;
+    background: white;
+    border: 1px solid #e9ecef;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    color: $text-dark;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238898aa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+}
+
+@keyframes slideInCascada {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Contenedor que envuelve cada mesa en el *ngFor */
+.mesa-item {
+    transition: transform 0.2s ease, margin 0.3s ease;
+    position: relative;
+
+    /* Cuando la mesa es parte de un grupo y NO es la primera */
+    &.es-unida {
+        margin-left: -50px;
+        /* Ajusta este valor según qué tanto quieres que se tapen */
+
+        &:hover {
+            transform: translateY(-10px) scale(1.05);
+            /* Se levanta un poco al pasar el mouse */
+            z-index: 50 !important;
+            /* Se pone al frente del grupo al tocarla */
+        }
+    }
+
+    /* Opcional: Para que la primera mesa del grupo se vea como la "líder" */
+    &.es-cabecera-grupo {
+        z-index: 10;
+        border-left: 4px solid #0d6efd;
+        /* Una marca azul para indicar inicio de grupo */
+        border-radius: 8px;
+    }
+}
