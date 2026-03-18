@@ -18,5 +18,5 @@ export interface FilaPago {
     mesa: string;
     metodo: string;
     monto: number;
-    hora: string;
+    hora: string;    
 }
