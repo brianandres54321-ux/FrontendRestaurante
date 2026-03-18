@@ -1,59 +1,113 @@
-# FrontendFactu
+# 🍽️ Frontend Factu - Sistema de Gestión de Restaurante
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.0.
+Este proyecto corresponde al **frontend** del sistema de gestión de restaurante, encargado de la interacción con el usuario y la visualización en tiempo real de pedidos, mesas y facturación.
 
-## Development server
+Está diseñado para integrarse con un backend basado en API REST, permitiendo operar en un entorno **multiempresa (SaaS)**.
 
-To start a local development server, run:
+---
+
+## 🚀 Características Principales
+
+El frontend permite gestionar de forma visual y dinámica la operación del restaurante:
+
+* 📋 **Visualización del Menú**
+  Consulta de productos organizados por categorías con imágenes y precios.
+
+* 🪑 **Gestión de Mesas**
+  Estado en tiempo real (ocupada, libre, en proceso).
+
+* 🧾 **Gestión de Pedidos**
+  Creación, edición y seguimiento de comandas.
+
+* 💳 **Proceso de Pago**
+  Interfaz para selección de métodos de pago y confirmación de pedidos.
+
+* 🔐 **Autenticación de Usuarios**
+  Acceso seguro mediante JWT conectado al backend.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+Desarrollado con tecnologías modernas para aplicaciones web:
+
+* **Framework:** Angular
+* **Lenguaje:** TypeScript
+* **Estilos:** Bootstrap
+* **Consumo API:** HTTP Client (REST)
+* **Gestión de estado:** Servicios Angular
+
+---
+
+## 🧩 Arquitectura
+
+El proyecto está estructurado en módulos y componentes reutilizables:
+
+* 📦 **Components:** UI reutilizable
+* 📄 **Pages:** Vistas principales (mesas, pedidos, login, etc.)
+* 🔧 **Services:** Comunicación con backend
+* 🔐 **Guards:** Protección de rutas
+* 🌐 **Interceptors:** Manejo de token JWT
+
+---
+
+## ⚙️ Instalación y Ejecución
 
 ```bash
+# Clonar repositorio
+git clone https://github.com/brianandres54321-ux/FrontendRestaurante.git
+
+# Entrar al proyecto
+cd FrontendRestaurante
+
+# Instalar dependencias
+npm install
+
+# Ejecutar aplicación
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Por defecto, la aplicación se ejecuta en:
 
-## Code scaffolding
+👉 http://localhost:4200
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
+## 🔗 Conexión con Backend
+
+Este frontend consume un backend REST.
+
+Asegúrate de configurar correctamente la URL del backend en:
+
+```
+src/environments/environment.ts
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Ejemplo:
 
-```bash
-ng generate --help
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api'
+};
 ```
 
-## Building
+---
 
-To build the project run:
+## ⚠️ Consideraciones Importantes
 
-```bash
-ng build
-```
+* Este proyecto depende completamente del backend para funcionar correctamente.
+* No incluye persistencia local de datos.
+* Requiere autenticación válida para acceder a módulos protegidos.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🧠 Observaciones
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Este frontend está orientado a evolucionar hacia un modelo SaaS, por lo que su diseño permite escalar a múltiples empresas mediante autenticación y segmentación de datos desde el backend.
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## 📌 Estado del Proyecto
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+En desarrollo activo. Pueden existir cambios en estructura, endpoints y funcionalidades.
