@@ -92,7 +92,7 @@ export class AuthService {
       const decoded = jwtDecode<TokenPayload>(token)
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem(this.TOKEN_KEY)
-        this.decodedToken = null
+        this.decodedToken = null 
       } else {
         this.decodedToken = decoded
       }

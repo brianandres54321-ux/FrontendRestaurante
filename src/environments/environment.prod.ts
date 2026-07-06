@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://visioncode.store/api'
+    apiUrl: 'https://backend-factu.onrender.com/api'
 };
