@@ -16,12 +16,22 @@ export class Login {
   email: string = '';
   password: string = '';
 
+  isLoading: boolean = false;
+  showPassword: boolean = false;
+
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
-  login() {
+  toggleShowPassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  login(): void {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
 
     const data: LoginRequest = {
       empresaId: this.empresaId,
@@ -31,17 +41,15 @@ export class Login {
 
     this.authService.login(data).subscribe({
       next: (res: any) => {
-
+        this.isLoading = false;
         this.authService.guardarToken(res.token);
-
         this.router.navigate(['/productos']);
       },
       error: (err) => {
+        this.isLoading = false;
         console.error('Error login', err);
         alert('Credenciales incorrectas');
       }
     });
-
   }
-
 }
