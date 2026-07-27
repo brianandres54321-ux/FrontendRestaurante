@@ -1,0 +1,132 @@
+.browser-frame {
+    max-width: 820px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #10b981; }
+
+.browser-url {
+    margin-left: 12px;
+    font-size: 12px;
+    color: #64748b;
+    background: #fff;
+    border-radius: 6px;
+    padding: 3px 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.browser-body {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 16px;
+    padding: 20px;
+    background: #f8f9fb;
+}
+
+.demo-mesas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    align-content: start;
+}
+
+.demo-mesa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #fff;
+    border: 2px solid transparent;
+}
+
+.demo-mesa i { font-size: 18px; }
+
+.estado-libre { color: #10b981; border-color: #a7f3d0; }
+.estado-ocupada { color: #ef4444; border-color: #fecaca; }
+.estado-cuenta { color: #f59e0b; border-color: #fde68a; }
+
+.demo-pedido {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.demo-pedido-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.badge-abierto {
+    font-size: 10px;
+    font-weight: 700;
+    color: #2563eb;
+    background: #eef2ff;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.demo-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #475569;
+    padding: 4px 0;
+}
+
+.demo-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 13px;
+    border-top: 1px dashed #e2e8f0;
+    margin-top: 6px;
+    padding-top: 8px;
+}
+
+.leyenda-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.leyenda-dot.estado-libre { background: #10b981; border: none; }
+.leyenda-dot.estado-ocupada { background: #ef4444; border: none; }
+.leyenda-dot.estado-cuenta { background: #f59e0b; border: none; }
+
+@media (max-width: 576px) {
+    .browser-body {
+        grid-template-columns: 1fr;
+    }
+}

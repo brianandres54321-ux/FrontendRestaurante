@@ -1,0 +1,52 @@
+<div class="landing">
+
+    <!-- Barra superior -->
+    <nav class="navbar navbar-expand px-4 py-3">
+        <div class="container-fluid px-0">
+            <span class="navbar-brand fw-bold mb-0">
+                <i class="bi bi-receipt-cutoff me-2"></i>MiFactura
+            </span>
+            <div class="d-flex gap-2">
+                <a routerLink="/login" class="btn btn-outline-primary">Iniciar sesión</a>
+                <a routerLink="/registro" class="btn btn-primary">Crear cuenta gratis</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero text-center px-3 py-5">
+        <h1 class="fw-black mb-3">
+            Administra tu restaurante o tienda desde un solo lugar
+        </h1>
+        <p class="lead text-muted mb-4 mx-auto" style="max-width: 640px;">
+            Mesas, pedidos, cocina, inventario, pagos y reportes en un sistema pensado
+            para negocios que facturan todos los días.
+        </p>
+        <div class="d-flex justify-content-center gap-3 mb-5">
+            <a routerLink="/registro" class="btn btn-primary btn-lg px-4">Empezar gratis</a>
+            <a routerLink="/login" class="btn btn-outline-secondary btn-lg px-4">Ya tengo cuenta</a>
+        </div>
+
+        <app-carrusel></app-carrusel>
+    </section>
+
+    <app-funcionalidades></app-funcionalidades>
+
+    <app-demo></app-demo>
+
+    <app-precios></app-precios>
+
+    <!-- CTA final -->
+    <section class="cta text-center px-3 py-5">
+        <h2 class="fw-bold mb-3">¿Listo para ordenar tu operación?</h2>
+        <p class="text-muted mb-4">Crea tu cuenta en minutos, sin tarjeta de crédito.</p>
+        <a routerLink="/registro" class="btn btn-primary btn-lg px-5">Crear cuenta gratis</a>
+    </section>
+
+    <app-contacto></app-contacto>
+
+    <footer class="text-center text-muted small py-4">
+        © {{ anioActual }} MiFactura — Sistema de gestión para restaurantes y tiendas.
+    </footer>
+
+</div>

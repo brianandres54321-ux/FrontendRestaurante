@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 
 import { environment } from '../../../../environments/environment'
-import { InventarioRequest } from '../../../shared/models/request/inventario-request.model'
-import { InventarioResponse } from '../../../shared/models/response/inventario-response.model'
+import { InventarioRequest, InventarioResponse } from '../../../shared/models/inventario.model'
 
 @Injectable({
   providedIn: 'root'

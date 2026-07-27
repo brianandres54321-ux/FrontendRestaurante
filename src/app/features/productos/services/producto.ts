@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 
 import { environment } from '../../../../environments/environment'
-import { ProductoRequest } from '../../../shared/models/request/producto-request.model'
-import { ProductoResponse } from '../../../shared/models/response/producto-response.model'
+import { ProductoRequest, ProductoResponse } from '../../../shared/models/producto.model'
 
 @Injectable({
   providedIn: 'root'

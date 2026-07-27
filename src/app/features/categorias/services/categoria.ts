@@ -3,8 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 
 import { environment } from '../../../../environments/environment'
-import { CategoriaRequest } from '../../../shared/models/request/categoria-request.model'
-import { CategoriaResponse } from '../../../shared/models/response/categoria-response.model'
+import { CategoriaRequest, CategoriaResponse } from '../../../shared/models/categoria.model'
 
 @Injectable({
   providedIn: 'root'

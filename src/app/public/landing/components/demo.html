@@ -1,0 +1,53 @@
+<section class="demo-section px-3 py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-2">Así se ve por dentro</h2>
+            <p class="text-muted">Una vista simplificada de cómo administras tu operación día a día.</p>
+        </div>
+
+        <div class="browser-frame mx-auto">
+
+            <div class="browser-bar">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span class="browser-url">app.mifactura.com/mesas</span>
+            </div>
+
+            <div class="browser-body">
+
+                <div class="demo-mesas">
+                    <div class="demo-mesa" *ngFor="let mesa of mesas" [class]="'estado-' + mesa.estado">
+                        <i class="bi bi-table"></i>
+                        <span>{{ mesa.nombre }}</span>
+                    </div>
+                </div>
+
+                <div class="demo-pedido">
+                    <div class="demo-pedido-header">
+                        <strong>Pedido — Mesa 1</strong>
+                        <span class="badge-abierto">ABIERTO</span>
+                    </div>
+                    <div class="demo-item" *ngFor="let item of items">
+                        <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+                        <span>{{ (item.cantidad * item.precio) | number:'1.0-0' }}</span>
+                    </div>
+                    <div class="demo-total">
+                        <span>Total</span>
+                        <span>${{ total | number:'1.0-0' }}</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm w-100 mt-2" disabled>Cobrar pedido</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="demo-leyenda text-center mt-4 small text-muted">
+            <span class="leyenda-dot estado-libre"></span> Libre
+            <span class="leyenda-dot estado-ocupada ms-3"></span> Ocupada
+            <span class="leyenda-dot estado-cuenta ms-3"></span> Esperando cuenta
+        </div>
+
+    </div>
+</section>

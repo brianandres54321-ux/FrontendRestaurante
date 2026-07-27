@@ -1,0 +1,75 @@
+<div class="gestion-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Categorías</h4>
+            <small class="text-muted">Agrupa tus productos para organizarlos y filtrarlos más fácil</small>
+        </div>
+        <div class="header-actions">
+            <button class="btn-sec btn-primary" (click)="abrirCrear()">
+                <i class="bi bi-plus-lg"></i> Nueva Categoría
+            </button>
+        </div>
+    </div>
+
+    <div class="col-categorias">
+
+        <div *ngIf="cargando" class="empty-state-sm">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
+        </div>
+
+        <div *ngIf="!cargando && categorias.length === 0" class="empty-state-sm full">
+            <i class="bi bi-tags"></i>
+            <span>Todavía no tienes categorías. Créalas para poder clasificar tus productos.</span>
+            <button class="btn-sec btn-primary btn-sm" (click)="abrirCrear()">
+                <i class="bi bi-plus-lg"></i> Crear la primera categoría
+            </button>
+        </div>
+
+        <div class="categorias-grid" *ngIf="!cargando && categorias.length > 0">
+            <div *ngFor="let c of categorias; trackBy: trackById" class="categoria-card">
+                <div class="categoria-info">
+                    <i class="bi bi-tag-fill categoria-icon"></i>
+                    <span class="categoria-nombre">{{ c.nombre }}</span>
+                </div>
+                <div class="categoria-acciones">
+                    <button class="btn-icon-sm" (click)="abrirEditar(c)" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-icon-sm btn-danger-sm" (click)="eliminar(c)" title="Eliminar">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── MODAL CATEGORÍA ── -->
+<div class="modal-overlay" *ngIf="modal" (click)="modal = false"></div>
+<div class="modal-panel" *ngIf="modal">
+    <div class="modal-header">
+        <h5>{{ editando ? 'Editar Categoría' : 'Nueva Categoría' }}</h5>
+        <button class="btn-close-modal" (click)="modal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+        <div class="alert-error" *ngIf="error">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+        </div>
+        <div class="form-group">
+            <label>Nombre de la categoría *</label>
+            <input type="text" [(ngModel)]="form.nombre" placeholder="Ej: Bebidas, Platos fuertes, Postres..."
+                (keyup.enter)="guardar()">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn-cancelar" (click)="modal = false">Cancelar</button>
+        <button class="btn-guardar" (click)="guardar()" [disabled]="guardando">
+            <span *ngIf="!guardando"><i class="bi bi-check-lg me-1"></i>{{ editando ? 'Guardar' : 'Crear' }}</span>
+            <span *ngIf="guardando"><span class="spinner-border spinner-border-sm me-1"></span> Guardando...</span>
+        </button>
+    </div>
+</div>

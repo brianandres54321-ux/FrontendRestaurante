@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { SeccionResponse } from '../../../shared/models/response/seccion-response.model';
+import { SeccionResponse } from '../../../shared/models/seccion.model';
 
 @Injectable({ providedIn: 'root' })
 export class SeccionesService {

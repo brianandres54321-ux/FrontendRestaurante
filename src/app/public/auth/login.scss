@@ -1,0 +1,80 @@
+body {
+    background: #f4f6f9;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.password-checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.password-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.password-checklist li.ok {
+    color: #10b981;
+}
+
+.password-checklist i {
+    font-size: 13px;
+}
+
+.tipo-negocio-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.tipo-negocio-opcion {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 14px 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s, background .15s;
+}
+
+.tipo-negocio-opcion input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tipo-negocio-opcion i {
+    font-size: 22px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.tipo-negocio-opcion span {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tipo-negocio-opcion small {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.tipo-negocio-opcion.seleccionada {
+    border-color: #2563eb;
+    background: #eef2ff;
+}
+
+.tipo-negocio-opcion.seleccionada i {
+    color: #2563eb;
+}

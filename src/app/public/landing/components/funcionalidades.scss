@@ -1,0 +1,22 @@
+.feature-card {
+    background: #fff;
+    border: 1px solid #eef0f3;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -8px rgba(0, 0, 0, .15) !important;
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2ff;
+    color: #2563eb;
+    font-size: 22px;
+}

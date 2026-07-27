@@ -1,0 +1,137 @@
+<div class="container d-flex justify-content-center align-items-center py-5">
+
+    <div class="card shadow-lg p-4" style="width: 460px;">
+
+        <h3 class="text-center mb-1">
+            Crea tu cuenta
+        </h3>
+        <p class="text-center text-muted small mb-4">
+            Regístrate gratis, sin tarjeta de crédito
+        </p>
+
+        <form (ngSubmit)="registrar()" #registerForm="ngForm">
+
+            <div class="mb-3">
+                <label class="form-label">Tipo de negocio</label>
+                <div class="tipo-negocio-selector">
+                    <label class="tipo-negocio-opcion" [class.seleccionada]="tipoNegocio === 'RESTAURANTE'">
+                        <input type="radio" name="tipoNegocio" value="RESTAURANTE" [(ngModel)]="tipoNegocio"
+                            [disabled]="isLoading">
+                        <i class="bi bi-shop"></i>
+                        <span>Restaurante</span>
+                        <small>Mesas, cocina y pedidos</small>
+                    </label>
+                    <label class="tipo-negocio-opcion" [class.seleccionada]="tipoNegocio === 'TIENDA'">
+                        <input type="radio" name="tipoNegocio" value="TIENDA" [(ngModel)]="tipoNegocio"
+                            [disabled]="isLoading">
+                        <i class="bi bi-bag"></i>
+                        <span>Tienda</span>
+                        <small>Venta directa en mostrador</small>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="empresaNombre" class="form-label">Nombre del negocio</label>
+                <input type="text" id="empresaNombre" name="empresaNombre" [(ngModel)]="empresaNombre" required
+                    class="form-control" placeholder="Ej. Restaurante El Buen Sabor" [disabled]="isLoading">
+            </div>
+
+            <div class="mb-3">
+                <label for="nitRut" class="form-label">NIT / RUT</label>
+                <input type="text" id="nitRut" name="nitRut" [(ngModel)]="nitRut" required class="form-control"
+                    placeholder="Ej. 900123456-7" [disabled]="isLoading">
+            </div>
+
+            <div class="mb-3">
+                <label for="adminNombre" class="form-label">Tu nombre</label>
+                <input type="text" id="adminNombre" name="adminNombre" [(ngModel)]="adminNombre" required
+                    class="form-control" placeholder="Nombre completo" [disabled]="isLoading">
+            </div>
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuario</label>
+                <input type="text" id="username" name="username" [(ngModel)]="username" required class="form-control"
+                    placeholder="Ej. jperez" [disabled]="isLoading">
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo</label>
+                <input type="email" id="email" name="email" [(ngModel)]="email" required email class="form-control"
+                    placeholder="Ingrese su correo" [disabled]="isLoading">
+            </div>
+
+            <div class="mb-3">
+                <label for="confirmarEmail" class="form-label">Confirmar correo</label>
+                <input type="email" id="confirmarEmail" name="confirmarEmail" [(ngModel)]="confirmarEmail" required
+                    class="form-control" [class.is-invalid]="confirmarEmail && !emailsCoinciden"
+                    placeholder="Repite tu correo" [disabled]="isLoading">
+                <div class="invalid-feedback" *ngIf="confirmarEmail && !emailsCoinciden">
+                    Los correos no coinciden
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-group">
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                        [(ngModel)]="password" required class="form-control"
+                        placeholder="Mínimo 8 caracteres" [disabled]="isLoading">
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleShowPassword()"
+                        [disabled]="isLoading">
+                        <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                    </button>
+                </div>
+            </div>
+
+            <ul class="password-checklist list-unstyled mb-3" *ngIf="password">
+                <li [class.ok]="tieneMinLength">
+                    <i class="bi" [class.bi-check-circle-fill]="tieneMinLength" [class.bi-circle]="!tieneMinLength"></i>
+                    Mínimo 8 caracteres
+                </li>
+                <li [class.ok]="tieneMayuscula">
+                    <i class="bi" [class.bi-check-circle-fill]="tieneMayuscula" [class.bi-circle]="!tieneMayuscula"></i>
+                    Una mayúscula
+                </li>
+                <li [class.ok]="tieneMinuscula">
+                    <i class="bi" [class.bi-check-circle-fill]="tieneMinuscula" [class.bi-circle]="!tieneMinuscula"></i>
+                    Una minúscula
+                </li>
+                <li [class.ok]="tieneNumero">
+                    <i class="bi" [class.bi-check-circle-fill]="tieneNumero" [class.bi-circle]="!tieneNumero"></i>
+                    Un número
+                </li>
+                <li [class.ok]="tieneEspecial">
+                    <i class="bi" [class.bi-check-circle-fill]="tieneEspecial" [class.bi-circle]="!tieneEspecial"></i>
+                    Un símbolo especial (!@#$...)
+                </li>
+            </ul>
+
+            <div class="mb-4">
+                <label for="confirmarPassword" class="form-label">Confirmar contraseña</label>
+                <input [type]="showPassword ? 'text' : 'password'" id="confirmarPassword" name="confirmarPassword"
+                    [(ngModel)]="confirmarPassword" required class="form-control"
+                    [class.is-invalid]="confirmarPassword && !passwordsCoinciden"
+                    placeholder="Repite tu contraseña" [disabled]="isLoading">
+                <div class="invalid-feedback" *ngIf="confirmarPassword && !passwordsCoinciden">
+                    Las contraseñas no coinciden
+                </div>
+            </div>
+
+            <button type="submit"
+                [disabled]="registerForm.invalid || !passwordValida || !emailsCoinciden || !passwordsCoinciden || isLoading"
+                class="btn btn-primary w-100">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                <span>{{ isLoading ? 'Creando cuenta...' : 'Crear cuenta' }}</span>
+            </button>
+
+            <p class="text-center text-muted small mt-3 mb-0">
+                ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+            </p>
+
+        </form>
+
+    </div>
+
+</div>

@@ -1,0 +1,371 @@
+<div class="container-fluid py-4 px-4 bg-light min-vh-100">
+
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-cash-stack me-2 text-success"></i>Cierre de Caja
+            </h4>
+            <small class="text-muted">Corte diario de ventas</small>
+        </div>
+        <button class="btn btn-outline-secondary rounded-3" (click)="toggleHistorial()">
+            <i class="bi bi-clock-history me-2"></i>{{ verHistorial ? 'Ocultar' : 'Ver' }} historial
+        </button>
+    </div>
+
+    <!-- ── PANEL IZQUIERDO: Preview + Acción ── -->
+    <div class="row g-4" *ngIf="!verHistorial">
+
+        <!-- Selector de fecha y preview -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+
+                    <!-- Fecha selector -->
+                    <div class="d-flex align-items-end gap-3 mb-4 flex-wrap">
+                        <div class="flex-grow-1">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Fecha del cierre</label>
+                            <input type="date" class="form-control rounded-3 fw-bold" [(ngModel)]="fechaSeleccionada"
+                                [max]="hoy" (change)="cargarPreview()" />
+                        </div>
+                        <button class="btn btn-outline-primary rounded-3" (click)="cargarPreview()"
+                            [disabled]="cargando">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+                        </button>
+                    </div>
+
+                    <!-- Spinner -->
+                    <div *ngIf="cargando" class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+
+                    <!-- Preview cargado -->
+                    <ng-container *ngIf="preview && !cargando">
+
+                        <!-- Badge si ya está cerrado -->
+                        <div *ngIf="preview.yaExiste"
+                            class="alert alert-success d-flex align-items-center gap-2 rounded-3 border-0 mb-4">
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <div>
+                                <strong>Caja cerrada</strong>
+                                <span class="d-block small text-success">
+                                    Corte realizado el {{ preview.cerradoEn | date:'dd/MM/yyyy HH:mm' }}
+                                    por {{ preview.usuarioNombre }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Recordatorio: falta la base de caja -->
+                        <div *ngIf="!preview.yaExiste && !preview.baseRegistrada"
+                            class="alert alert-warning d-flex align-items-start gap-2 rounded-3 border-0 mb-4">
+                            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                            <div class="flex-grow-1">
+                                <strong>Falta registrar la base de caja</strong>
+                                <span class="d-block small">
+                                    Es el efectivo con el que se abrió la caja hoy (para dar vueltas). Sin esto no
+                                    se puede hacer el cierre.
+                                </span>
+                                <div class="d-flex gap-2 mt-2">
+                                    <div class="input-group input-group-sm" style="max-width: 200px;">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" min="0" [(ngModel)]="baseInput"
+                                            placeholder="Ej. 50000">
+                                    </div>
+                                    <button class="btn btn-sm btn-warning fw-bold" (click)="registrarBase()"
+                                        [disabled]="baseInput === null || baseInput < 0 || guardandoBase">
+                                        {{ guardandoBase ? 'Guardando...' : 'Registrar base' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Base ya registrada (y aún no cerrado) — se puede corregir -->
+                        <div *ngIf="!preview.yaExiste && preview.baseRegistrada"
+                            class="d-flex align-items-center justify-content-between rounded-3 border p-2 px-3 mb-4 small">
+                            <span class="text-muted">
+                                <i class="bi bi-cash-coin me-1"></i>
+                                Base de caja: <strong class="text-dark">{{ preview.baseInicial | currency:'COP':'$':'1.0-0' }}</strong>
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="input-group input-group-sm" style="max-width: 160px;">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" min="0" [(ngModel)]="baseInput">
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" (click)="registrarBase()"
+                                    [disabled]="baseInput === null || baseInput < 0 || guardandoBase">
+                                    Corregir
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KPIs -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-sm-3">
+                                <div class="text-center p-3 bg-primary bg-opacity-10 rounded-3">
+                                    <div class="fw-black fs-4 text-primary">
+                                        {{ preview.totalVentas | currency:'COP':'$':'1.0-0' }}
+                                    </div>
+                                    <div class="small text-muted fw-bold">Total ventas</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <div class="text-center p-3 bg-success bg-opacity-10 rounded-3">
+                                    <div class="fw-black fs-4 text-success">
+                                        {{ preview.totalEfectivo | currency:'COP':'$':'1.0-0' }}
+                                    </div>
+                                    <div class="small text-muted fw-bold">Efectivo</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <div class="text-center p-3 rounded-3" style="background:#e0f4fd;">
+                                    <div class="fw-black fs-4" style="color:#009EE3;">
+                                        {{ preview.totalMercadoPago | currency:'COP':'$':'1.0-0' }}
+                                    </div>
+                                    <div class="small text-muted fw-bold">Mercado Pago</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <div class="text-center p-3 bg-secondary bg-opacity-10 rounded-3">
+                                    <div class="fw-black fs-4 text-dark">{{ preview.cantidadPedidos }}</div>
+                                    <div class="small text-muted fw-bold">Pedidos</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total esperado en caja (base + efectivo) -->
+                        <div *ngIf="preview.baseRegistrada" class="rounded-3 p-3 mb-4 d-flex justify-content-between align-items-center"
+                            style="background:#fff7ed;">
+                            <span class="fw-bold text-dark">
+                                <i class="bi bi-safe2 me-2 text-warning"></i>Debería haber en caja
+                            </span>
+                            <span class="fw-black fs-5 text-dark">
+                                {{ preview.totalEnCaja | currency:'COP':'$':'1.0-0' }}
+                            </span>
+                        </div>
+
+                        <!-- Tabla de pagos del día -->
+                        <div *ngIf="preview.pagos && preview.pagos.length > 0">
+                            <h6 class="fw-bold text-muted text-uppercase small mb-2">
+                                <i class="bi bi-list-ul me-1"></i>Detalle del día
+                            </h6>
+                            <div style="max-height: 260px; overflow-y:auto;">
+                                <table class="table table-borderless table-sm align-middle mb-0 small">
+                                    <thead class="bg-light text-muted sticky-top" style="font-size:11px;">
+                                        <tr>
+                                            <th class="ps-3">Pedido</th>
+                                            <th *ngIf="authService.esRestaurante">Mesa</th>
+                                            <th>Método</th>
+                                            <th class="text-end pe-3">Monto</th>
+                                            <th>Hora</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of preview.pagos" class="border-bottom border-light">
+                                            <td class="ps-3 text-muted">#{{ p.pedidoId }}</td>
+                                            <td *ngIf="authService.esRestaurante" class="fw-bold">{{ p.mesa }}</td>
+                                            <td>
+                                                <span class="badge rounded-pill" [class]="p.metodo === 'EFECTIVO'
+                            ? 'bg-success bg-opacity-10 text-success'
+                            : 'bg-info bg-opacity-10 text-info'">
+                                                    {{ p.metodo === 'EFECTIVO' ? 'Efectivo' : 'Mercado Pago' }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end pe-3 fw-bold">
+                                                {{ p.monto | currency:'COP':'$':'1.0-0' }}
+                                            </td>
+                                            <td class="text-muted">{{ p.hora }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sin ventas -->
+                        <div *ngIf="!preview.pagos || preview.pagos.length === 0" class="text-center py-4 text-muted">
+                            <i class="bi bi-receipt display-4 opacity-25"></i>
+                            <p class="mt-2 small">Sin ventas registradas para este día</p>
+                        </div>
+
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de acción: confirmar cierre -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top:2rem;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3">
+                        <i class="bi bi-check2-square me-1"></i>Confirmar Cierre
+                    </h6>
+
+                    <!-- Ya existe -->
+                    <div *ngIf="preview?.yaExiste" class="text-center py-4 text-muted">
+                        <i class="bi bi-patch-check-fill text-success display-4"></i>
+                        <p class="mt-2 fw-bold">Este día ya tiene cierre registrado</p>
+                        <p class="small">No se puede realizar un segundo corte para la misma fecha.</p>
+                    </div>
+
+                    <!-- Sin preview -->
+                    <div *ngIf="!preview && !cargando" class="text-center py-4 text-muted small">
+                        <i class="bi bi-calendar-date display-4 opacity-25"></i>
+                        <p class="mt-2">Selecciona una fecha para ver el resumen</p>
+                    </div>
+
+                    <!-- Formulario de cierre -->
+                    <ng-container *ngIf="preview && !preview.yaExiste && !cargando">
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Fecha</span>
+                                <span class="fw-bold small">{{ fechaSeleccionada | date:'dd/MM/yyyy':'UTC' }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted small">Total a cortar</span>
+                                <span class="fw-black text-primary">
+                                    {{ preview.totalVentas | currency:'COP':'$':'1.0-0' }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted small">Pedidos</span>
+                                <span class="fw-bold small">{{ preview.cantidadPedidos }}</span>
+                            </div>
+                        </div>
+
+                        <label class="form-label fw-bold small text-muted text-uppercase">
+                            Notas del cierre <span class="fw-normal">(opcional)</span>
+                        </label>
+                        <textarea class="form-control rounded-3 mb-3" rows="3"
+                            placeholder="Ej: Efectivo entregado a gerencia, diferencias, observaciones..."
+                            [(ngModel)]="notasCierre" maxlength="500"></textarea>
+
+                        <button class="btn btn-success w-100 rounded-3 py-3 fw-bold fs-5" (click)="confirmarCierre()"
+                            [disabled]="procesando || preview.cantidadPedidos === 0 || !preview.baseRegistrada">
+                            <span *ngIf="!procesando">
+                                <i class="bi bi-lock me-2"></i>Cerrar Caja
+                            </span>
+                            <span *ngIf="procesando">
+                                <span class="spinner-border spinner-border-sm me-2"></span>Procesando...
+                            </span>
+                        </button>
+
+                        <p *ngIf="preview.cantidadPedidos === 0" class="text-center text-muted small mt-2 mb-0">
+                            No hay pedidos pagados para cerrar en esta fecha
+                        </p>
+                        <p *ngIf="preview.cantidadPedidos > 0 && !preview.baseRegistrada"
+                            class="text-center text-warning small mt-2 mb-0 fw-bold">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Registra la base de caja para poder cerrar
+                        </p>
+                    </ng-container>
+
+                    <!-- Error -->
+                    <div *ngIf="error" class="alert alert-danger rounded-3 mt-3 small border-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── HISTORIAL ── -->
+    <div *ngIf="verHistorial">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-bottom border-light py-3 rounded-top-4">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Historial de Cierres
+                </h6>
+            </div>
+
+            <div *ngIf="cargandoHistorial" class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+            </div>
+
+            <div *ngIf="!cargandoHistorial && historial.length === 0" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox display-4 opacity-25"></i>
+                <p class="mt-2">Sin cierres registrados aún</p>
+            </div>
+
+            <div class="table-responsive" *ngIf="!cargandoHistorial && historial.length > 0">
+                <table class="table table-borderless align-middle mb-0 small">
+                    <thead class="bg-light text-muted" style="font-size:11px;">
+                        <tr>
+                            <th class="ps-4">Fecha</th>
+                            <th>Total ventas</th>
+                            <th>Efectivo</th>
+                            <th>Mercado Pago</th>
+                            <th class="text-center">Pedidos</th>
+                            <th>Cerrado por</th>
+                            <th>Hora corte</th>
+                            <th class="pe-4">Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of historial" class="border-bottom border-light"
+                            [class.table-active]="cierreSeleccionado?.id === c.id" style="cursor:pointer;"
+                            (click)="verDetalle(c)">
+                            <td class="ps-4 fw-bold text-dark">{{ c.fecha | date:'dd/MM/yyyy':'UTC' }}</td>
+                            <td class="fw-black text-primary">{{ c.totalVentas | currency:'COP':'$':'1.0-0' }}</td>
+                            <td class="text-success fw-bold">{{ c.totalEfectivo | currency:'COP':'$':'1.0-0' }}</td>
+                            <td class="fw-bold" style="color:#009EE3;">
+                                {{ c.totalMercadoPago | currency:'COP':'$':'1.0-0' }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border rounded-pill">{{ c.cantidadPedidos
+                                    }}</span>
+                            </td>
+                            <td class="text-muted">{{ c.usuarioNombre }}</td>
+                            <td class="text-muted">{{ c.cerradoEn | date:'HH:mm' }}</td>
+                            <td class="pe-4 text-muted"
+                                style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                {{ c.notas || '—' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detalle expandido al hacer clic en una fila -->
+        <div *ngIf="cierreSeleccionado" class="card border-0 shadow-sm rounded-4 mt-4">
+            <div
+                class="card-header bg-white border-bottom border-light py-3 rounded-top-4 d-flex justify-content-between">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-receipt me-2 text-success"></i>
+                    Detalle — {{ cierreSeleccionado.fecha | date:'dd/MM/yyyy':'UTC' }}
+                </h6>
+                <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="cierreSeleccionado = null">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="card-body p-0" style="max-height:300px;overflow-y:auto;">
+                <table class="table table-borderless table-sm align-middle mb-0 small">
+                    <thead class="bg-light text-muted sticky-top" style="font-size:11px;">
+                        <tr>
+                            <th class="ps-4">Pedido</th>
+                            <th *ngIf="authService.esRestaurante">Mesa</th>
+                            <th>Método</th>
+                            <th class="text-end pe-4">Monto</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of cierreSeleccionado.pagos" class="border-bottom border-light">
+                            <td class="ps-4 text-muted">#{{ p.pedidoId }}</td>
+                            <td *ngIf="authService.esRestaurante" class="fw-bold">{{ p.mesa }}</td>
+                            <td>
+                                <span class="badge rounded-pill" [class]="p.metodo === 'EFECTIVO'
+                    ? 'bg-success bg-opacity-10 text-success'
+                    : 'bg-info bg-opacity-10 text-info'">
+                                    {{ p.metodo === 'EFECTIVO' ? 'Efectivo' : 'Mercado Pago' }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4 fw-bold">{{ p.monto | currency:'COP':'$':'1.0-0' }}</td>
+                            <td class="text-muted">{{ p.hora }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

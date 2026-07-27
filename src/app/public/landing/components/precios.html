@@ -1,0 +1,45 @@
+<section class="precios-section px-3 py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-2">Precios claros, sin sorpresas</h2>
+            <p class="text-muted">Empieza gratis y sube de plan solo cuando lo necesites.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4" *ngFor="let plan of planes">
+                <div class="plan-card h-100 p-4 rounded-4" [class.plan-destacado]="plan.recomendado"
+                    [style.--plan-color]="plan.color">
+
+                    <span class="plan-badge" *ngIf="plan.recomendado">Más elegido</span>
+
+                    <h4 class="fw-bold mb-0">{{ plan.nombre }}</h4>
+                    <p class="plan-precio mb-3">{{ plan.precio }}</p>
+
+                    <ul class="plan-lista list-unstyled mb-4">
+                        <li><i class="bi bi-check-circle-fill"></i> {{ plan.capacidad }}</li>
+                        <li><i class="bi bi-check-circle-fill"></i> {{ plan.usuarios }}</li>
+                        <li>
+                            <i class="bi" [class.bi-check-circle-fill]="plan.mercadoPago"
+                                [class.bi-x-circle]="!plan.mercadoPago" [class.text-muted]="!plan.mercadoPago"></i>
+                            Pagos con Mercado Pago
+                        </li>
+                        <li>
+                            <i class="bi" [class.bi-check-circle-fill]="plan.reportes"
+                                [class.bi-x-circle]="!plan.reportes" [class.text-muted]="!plan.reportes"></i>
+                            Reportes de ventas
+                        </li>
+                        <li><i class="bi bi-check-circle-fill"></i> Soporte {{ plan.soporte }}</li>
+                    </ul>
+
+                    <a routerLink="/registro" class="btn w-100"
+                        [class.btn-primary]="plan.recomendado"
+                        [class.btn-outline-primary]="!plan.recomendado">
+                        Empezar con {{ plan.nombre }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

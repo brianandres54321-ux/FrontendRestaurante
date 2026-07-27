@@ -6,11 +6,12 @@ import { environment } from '../../../../environments/environment';
 
 import {
   AbrirPedidoRequest,
+  AbrirVentaDirectaRequest,
   AgregarProductoRequest,
-  RegistrarPagoRequest
-} from '../../../shared/models/request';
-
-import { PedidoResponse } from '../../../shared/models/response/pedido-response.model';
+  ReducirCantidadRequest,
+  PedidoResponse
+} from '../../../shared/models/pedido.model';
+import { RegistrarPagoRequest } from '../../../shared/models/pago.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,13 @@ export class PedidoService {
     );
   }
 
+  abrirVentaDirecta(empresaId: number, data: AbrirVentaDirectaRequest): Observable<PedidoResponse> {
+    return this.http.post<PedidoResponse>(`${this.getUrl(empresaId)}/venta-directa`, data).pipe(
+      map(pedido => this.formatearPedido(pedido)),
+      catchError(err => this.manejarError(err))
+    );
+  }
+
   agregarProducto(empresaId: number, pedidoId: number, data: AgregarProductoRequest): Observable<PedidoResponse> {
     return this.http.post<PedidoResponse>(`${this.getUrl(empresaId)}/${pedidoId}/productos`, data).pipe(
       map(pedido => this.formatearPedido(pedido)),
@@ -60,6 +68,13 @@ export class PedidoService {
     );
   }
 
+  reducirCantidadItem(empresaId: number, itemId: number, data: ReducirCantidadRequest): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.getUrl(empresaId)}/items/${itemId}/cantidad`, data).pipe(
+      map(pedido => this.formatearPedido(pedido)),
+      catchError(err => this.manejarError(err))
+    );
+  }
+
   registrarPago(empresaId: number, pedidoId: number, data: RegistrarPagoRequest): Observable<PedidoResponse> {
     return this.http.post<PedidoResponse>(`${this.getUrl(empresaId)}/${pedidoId}/pago`, data).pipe(
       catchError(err => this.manejarError(err))
@@ -68,6 +83,12 @@ export class PedidoService {
 
   cerrarPedido(empresaId: number, pedidoId: number): Observable<PedidoResponse> {
     return this.http.put<PedidoResponse>(`${this.getUrl(empresaId)}/${pedidoId}/cerrar`, {}).pipe(
+      catchError(err => this.manejarError(err))
+    );
+  }
+
+  cancelarPedido(empresaId: number, pedidoId: number): Observable<PedidoResponse> {
+    return this.http.put<PedidoResponse>(`${this.getUrl(empresaId)}/${pedidoId}/cancelar`, {}).pipe(
       catchError(err => this.manejarError(err))
     );
   }

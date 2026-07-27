@@ -1,0 +1,52 @@
+.plan-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #eef0f3;
+    box-shadow: 0 4px 14px -6px rgba(0, 0, 0, .08);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px -10px rgba(0, 0, 0, .15);
+}
+
+.plan-destacado {
+    border-color: var(--plan-color, #2563eb);
+    box-shadow: 0 10px 30px -8px rgba(37, 99, 235, .25);
+}
+
+.plan-badge {
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    background: var(--plan-color, #2563eb);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+.plan-precio {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--plan-color, #0f172a);
+}
+
+.plan-lista li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #475569;
+    padding: 4px 0;
+}
+
+.plan-lista i.bi-check-circle-fill {
+    color: #10b981;
+}
+
+.plan-lista i.bi-x-circle {
+    color: #cbd5e1;
+}

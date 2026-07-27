@@ -1,0 +1,116 @@
+<div class="venta-directa">
+
+    <div class="panel-productos">
+
+        <div class="scanner-bar">
+            <i class="bi bi-upc-scan"></i>
+            <input type="text" class="scanner-input" placeholder="Escanea o escribe el código de barras y presiona Enter"
+                [(ngModel)]="codigoEscaneado" (keyup.enter)="escanear()" [disabled]="procesandoEscaneo" autofocus>
+            <button class="btn-scanner-buscar" (click)="escanear()" [disabled]="procesandoEscaneo">
+                Buscar
+            </button>
+        </div>
+
+        <app-modal-producto [productos]="productos" (alSeleccionar)="onProductoSeleccionado($event)">
+        </app-modal-producto>
+    </div>
+
+    <div class="panel-carrito">
+
+        <div class="carrito-header">
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-cart3 me-2"></i>Venta en curso
+            </h5>
+            <button *ngIf="pedido" class="btn btn-sm btn-outline-danger" (click)="cancelarVenta()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="carrito-items">
+            <div *ngIf="!pedido || pedido.items.length === 0" class="carrito-vacio">
+                <i class="bi bi-bag display-4 text-muted opacity-25"></i>
+                <p class="text-muted mt-2">Agrega productos para iniciar una venta</p>
+            </div>
+
+            <div *ngFor="let item of pedido?.items" class="carrito-item">
+                <div class="carrito-item-info">
+                    <span class="fw-bold">{{ item.productoNombre }}</span>
+                    <span class="text-muted small">{{ item.precioUnitario | currency:'COP':'$':'1.0-0' }} c/u</span>
+                </div>
+                <div class="carrito-item-acciones">
+                    <div class="carrito-stepper">
+                        <button class="btn-stepper" (click)="restarUnidad(item)" title="Quitar una unidad">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="carrito-cantidad">{{ item.cantidad }}</span>
+                        <button class="btn-stepper" (click)="sumarUnidad(item)" title="Agregar una unidad">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <span class="fw-bold carrito-subtotal">{{ item.subtotal | currency:'COP':'$':'1.0-0' }}</span>
+                    <button class="btn btn-sm btn-link text-danger" (click)="quitarProducto(item)" title="Quitar todas las unidades">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="carrito-footer" *ngIf="pedido && pedido.items.length > 0">
+
+            <div class="carrito-total">
+                <span>Total</span>
+                <span>{{ total | currency:'COP':'$':'1.0-0' }}</span>
+            </div>
+
+            <!-- Selección de método -->
+            <div class="metodo-selector" *ngIf="!metodoPago && !esperandoMercadoPago">
+                <button class="btn btn-outline-primary" (click)="seleccionarMetodo('EFECTIVO')">
+                    <i class="bi bi-cash-stack me-1"></i> Efectivo
+                </button>
+                <button class="btn btn-outline-primary" (click)="pagarConMercadoPago()" [disabled]="procesandoMercadoPago">
+                    <i class="bi bi-credit-card me-1"></i>
+                    {{ procesandoMercadoPago ? 'Conectando...' : 'Mercado Pago' }}
+                </button>
+            </div>
+
+            <!-- Efectivo -->
+            <div class="pago-efectivo" *ngIf="metodoPago === 'EFECTIVO'">
+                <label class="form-label small">Efectivo recibido</label>
+                <input type="number" class="form-control mb-2" [(ngModel)]="efectivoRecibido"
+                    (ngModelChange)="calcularVueltas()">
+
+                <div class="d-flex gap-2 mb-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-secondary" *ngFor="let billete of [10000, 20000, 50000, 100000]"
+                        (click)="usarBillete(billete)">
+                        {{ billete | currency:'COP':'$':'1.0-0' }}
+                    </button>
+                </div>
+
+                <div class="vueltas" [class.negativo]="vueltas < 0">
+                    Vueltas: {{ vueltas | currency:'COP':'$':'1.0-0' }}
+                </div>
+
+                <button class="btn btn-primary w-100 mt-2" [disabled]="vueltas < 0 || procesandoPago"
+                    (click)="finalizarPago()">
+                    {{ procesandoPago ? 'Procesando...' : 'Confirmar cobro' }}
+                </button>
+                <button class="btn btn-link w-100 text-muted" (click)="seleccionarMetodo(null)">Cambiar método</button>
+            </div>
+
+            <!-- Esperando confirmación Mercado Pago -->
+            <div class="pago-mercadopago" *ngIf="esperandoMercadoPago">
+                <p class="text-muted small mb-2">
+                    <i class="bi bi-hourglass-split me-1"></i>
+                    Esperando que el cliente complete el pago en la pestaña de Mercado Pago...
+                </p>
+                <button class="btn btn-primary w-100" [disabled]="verificandoMercadoPago" (click)="verificarPagoMercadoPago()">
+                    {{ verificandoMercadoPago ? 'Verificando...' : 'Ya pagó, verificar' }}
+                </button>
+                <button class="btn btn-link w-100 text-muted" (click)="esperandoMercadoPago = false">Cambiar método</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

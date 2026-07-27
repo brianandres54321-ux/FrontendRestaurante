@@ -12,6 +12,18 @@ export interface LoginRequest {
   password: string
 }
 
+export type TipoNegocio = 'RESTAURANTE' | 'TIENDA'
+
+export interface RegisterRequest {
+  empresaNombre: string
+  tipoNegocio: TipoNegocio
+  nitRut: string
+  adminNombre: string
+  username: string
+  email: string
+  password: string
+}
+
 export interface LoginResponse {
   token: string
 }
@@ -23,6 +35,7 @@ interface TokenPayload {
   empresaNombre: string
   rol: string
   plan: string   // ✅ plan incluido
+  tipoNegocio: TipoNegocio
   exp: number
 }
 
@@ -39,6 +52,10 @@ export class AuthService {
 
   login(data: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data)
+  }
+
+  register(data: RegisterRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/register`, data)
   }
 
   /**
@@ -106,6 +123,7 @@ export class AuthService {
   getEmpresaNombre(): string { return this.decodedToken?.empresaNombre ?? '' }
   getUsername(): string { return this.decodedToken?.sub ?? '' }
   getPlan(): string { return this.decodedToken?.plan ?? 'BASICO' }
+  getTipoNegocio(): TipoNegocio { return this.decodedToken?.tipoNegocio ?? 'RESTAURANTE' }
 
   // ── Helpers de plan ───────────────────────────────────────────
   get esPlanBasico(): boolean { return this.getPlan() === 'BASICO' }
@@ -114,4 +132,8 @@ export class AuthService {
   get permiteMercadoPago(): boolean {
     return this.esPlanPro || this.esPlanPremium
   }
+
+  // ── Helpers de tipo de negocio ─────────────────────────────────
+  get esRestaurante(): boolean { return this.getTipoNegocio() === 'RESTAURANTE' }
+  get esTienda(): boolean { return this.getTipoNegocio() === 'TIENDA' }
 }

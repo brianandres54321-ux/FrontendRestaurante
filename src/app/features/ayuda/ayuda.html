@@ -1,0 +1,41 @@
+<div class="ayuda-page">
+
+    <div class="page-header">
+        <div>
+            <h4 class="page-title">Ayuda</h4>
+            <small class="text-muted">Qué es cada cosa y para qué sirve</small>
+        </div>
+    </div>
+
+    <div class="grupo" *ngFor="let grupo of grupos">
+        <h6 class="grupo-titulo">{{ grupo.titulo }}</h6>
+
+        <div class="items-grid">
+            <div class="item-card" *ngFor="let item of itemsVisibles(grupo)">
+                <div class="item-icono">
+                    <i class="bi" [class]="item.icono"></i>
+                </div>
+                <div>
+                    <div class="item-titulo">{{ item.titulo }}</div>
+                    <p class="item-descripcion">{{ item.descripcion }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grupo">
+        <h6 class="grupo-titulo">Preguntas frecuentes</h6>
+
+        <div class="faq">
+            <div class="faq-item" *ngFor="let p of preguntas; let i = index">
+                <button class="faq-pregunta" (click)="toggle('faq' + i)">
+                    <span>{{ p.pregunta }}</span>
+                    <i class="bi" [class.bi-chevron-down]="abierto !== ('faq' + i)"
+                        [class.bi-chevron-up]="abierto === ('faq' + i)"></i>
+                </button>
+                <p class="faq-respuesta" *ngIf="abierto === ('faq' + i)">{{ p.respuesta }}</p>
+            </div>
+        </div>
+    </div>
+
+</div>
