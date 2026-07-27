@@ -1,0 +1,31 @@
+<div class="tour-overlay" *ngIf="tourService.activo()">
+
+    <div class="tour-dim" *ngIf="sinObjetivo()"></div>
+
+    <div class="tour-spotlight" *ngIf="!sinObjetivo()" [ngStyle]="spotlightStyle()"></div>
+
+    <div class="tour-card" [class.tour-card-centrada]="sinObjetivo()" [ngStyle]="!sinObjetivo() ? cardStyle() : {}">
+
+        <div class="tour-paso">Paso {{ tourService.pasoActual() + 1 }} de {{ tourService.totalPasos }}</div>
+
+        <h5>{{ tourService.pasoActualData.titulo }}</h5>
+        <p>{{ tourService.pasoActualData.texto }}</p>
+
+        <div class="tour-acciones">
+            <button class="btn-saltar" (click)="tourService.saltar()">Saltar tour</button>
+
+            <div class="tour-nav-btns">
+                <button class="btn btn-sm btn-outline-secondary" *ngIf="tourService.pasoActual() > 0"
+                    (click)="tourService.anterior()">
+                    Atrás
+                </button>
+
+                <button class="btn btn-sm btn-primary" (click)="tourService.siguiente()">
+                    {{ tourService.esUltimoPaso ? 'Finalizar' : 'Siguiente' }}
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>

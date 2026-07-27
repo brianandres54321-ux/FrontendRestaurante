@@ -1,0 +1,98 @@
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.tour-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  z-index: 10000;
+}
+
+.tour-spotlight {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65);
+  z-index: 10000;
+  transition: top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+  pointer-events: none;
+}
+
+.tour-card {
+  position: fixed;
+  z-index: 10001;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.25);
+  transition: top .25s ease, left .25s ease;
+
+  h5 {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+
+  p {
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+}
+
+.tour-card-centrada {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100vw - 32px));
+}
+
+.tour-paso {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.tour-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-saltar {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: #64748b;
+    text-decoration: underline;
+  }
+}
+
+.tour-nav-btns {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 576px) {
+  .tour-card:not(.tour-card-centrada) {
+    width: calc(100vw - 32px) !important;
+    left: 16px !important;
+  }
+
+  .tour-card-centrada {
+    width: calc(100vw - 32px) !important;
+  }
+}

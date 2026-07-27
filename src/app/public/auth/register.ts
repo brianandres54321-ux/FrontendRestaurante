@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterRequest, TipoNegocio } from '../../core/services/auth.service';
+import { TourService } from '../../core/services/tour.service';
 
 @Component({
   selector: 'app-register',
@@ -28,6 +29,7 @@ export class Register {
 
   constructor(
     private authService: AuthService,
+    private tourService: TourService,
     private router: Router
   ) { }
 
@@ -89,6 +91,7 @@ export class Register {
       next: (res) => {
         this.isLoading = false;
         this.authService.guardarToken(res.token);
+        this.tourService.marcarNuevoUsuario();
         this.router.navigate(['/productos']);
       },
       error: (err) => {

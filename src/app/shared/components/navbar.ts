@@ -38,6 +38,6 @@ export class Navbar {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/');
   }
 }

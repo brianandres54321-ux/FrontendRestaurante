@@ -30,8 +30,8 @@
                 <span>{{ viendoInactivos ? 'Volver al Inventario' : 'Ver Papelera' }}</span>
             </button>
 
-            <button *ngIf="!viendoInactivos" class="btn btn-sm btn-primary shadow-sm d-flex align-items-center gap-2"
-                (click)="abrirModal()">
+            <button *ngIf="!viendoInactivos" id="tour-add-product-btn"
+                class="btn btn-sm btn-primary shadow-sm d-flex align-items-center gap-2" (click)="abrirModal()">
                 <i class="bi bi-plus-lg"></i>
                 <span>Nuevo</span>
             </button>

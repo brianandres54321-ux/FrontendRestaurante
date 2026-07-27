@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { TourService } from '../../core/services/tour.service';
 
 interface ItemAyuda {
   icono: string;
@@ -127,7 +129,11 @@ export class Ayuda {
     }
   ];
 
-  constructor(public authService: AuthService) { }
+  constructor(
+    public authService: AuthService,
+    private tourService: TourService,
+    private router: Router
+  ) { }
 
   itemsVisibles(grupo: GrupoAyuda): ItemAyuda[] {
     return grupo.items.filter(i => {
@@ -139,5 +145,9 @@ export class Ayuda {
 
   toggle(id: string): void {
     this.abierto = this.abierto === id ? null : id;
+  }
+
+  verTourDeNuevo(): void {
+    this.router.navigate(['/productos']).then(() => this.tourService.reiniciar());
   }
 }

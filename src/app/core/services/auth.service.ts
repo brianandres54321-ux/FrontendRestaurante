@@ -85,7 +85,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY)
     this.decodedToken = null
-    this.router.navigate(['/login'])
+    this.router.navigate(['/'])
   }
 
   estaAutenticado(): boolean {

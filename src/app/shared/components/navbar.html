@@ -66,13 +66,13 @@
             <span>Cierre de Caja</span>
         </a>
 
-        <a *ngIf="esAdmin" [routerLink]="['/productos']" routerLinkActive="active"
+        <a *ngIf="esAdmin" id="tour-nav-productos" [routerLink]="['/productos']" routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }" title="Productos">
             <i class="bi bi-box-seam"></i>
             <span>Productos</span>
         </a>
 
-        <a *ngIf="esAdmin" [routerLink]="['/categorias']" routerLinkActive="active"
+        <a *ngIf="esAdmin" id="tour-nav-categorias" [routerLink]="['/categorias']" routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }" title="Categorías">
             <i class="bi bi-tags"></i>
             <span>Categorías</span>
