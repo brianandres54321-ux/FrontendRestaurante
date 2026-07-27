@@ -1,0 +1,37 @@
+<section class="tipos-section px-3 py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-2">Un sistema, dos formas de vender</h2>
+            <p class="text-muted">Elegís tu tipo de negocio al crear tu cuenta y el sistema se adapta a vos.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-lg-6" *ngFor="let tipo of tipos">
+                <div class="tipo-card h-100 p-4 rounded-4">
+                    <div class="tipo-icon mb-3">
+                        <i class="bi" [class]="tipo.icono"></i>
+                    </div>
+
+                    <h4 class="fw-bold mb-1">{{ tipo.titulo }}</h4>
+                    <p class="text-muted small mb-4">{{ tipo.descripcion }}</p>
+
+                    <ul class="tipo-lista list-unstyled mb-0">
+                        <li *ngFor="let item of tipo.items">
+                            <i class="bi" [class]="item.icono"></i>
+                            <span>{{ item.texto }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="comunes-box text-center mt-4 p-4 rounded-4">
+            <p class="fw-semibold mb-3">Ambos incluyen</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <span class="comun-pill" *ngFor="let c of comunes">{{ c }}</span>
+            </div>
+        </div>
+
+    </div>
+</section>

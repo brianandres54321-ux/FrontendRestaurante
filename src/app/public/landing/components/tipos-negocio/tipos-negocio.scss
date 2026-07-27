@@ -1,0 +1,57 @@
+.tipo-card {
+    background: #fff;
+    border: 1px solid #eef0f3;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.tipo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -8px rgba(0, 0, 0, .15);
+}
+
+.tipo-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2ff;
+    color: #2563eb;
+    font-size: 26px;
+}
+
+.tipo-lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: #475569;
+    padding: 8px 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.tipo-lista li:first-child {
+    border-top: none;
+}
+
+.tipo-lista i {
+    color: #2563eb;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.comunes-box {
+    background: #eef2ff;
+}
+
+.comun-pill {
+    background: #fff;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+}
